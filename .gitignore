@@ -1,0 +1,49 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# macOS
+.DS_Store
+
+# Android
+android/build/
+android/.gradle/
+android/local.properties
+*.apk
+*.aab
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+*.ipa
+
+# Environment & Secrets
+.env
+.env.*
+*.jks
+*.keystore
+
+# Vercel
+.vercel/
+
+# Python (if any scripts)
+__pycache__/
+*.pyc
+myenv/
+venv/
+
+# Node
+node_modules/
+
+# Test artifacts
+coverage/

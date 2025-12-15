@@ -1,0 +1,28 @@
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:wallet/providers/auth.dart';
+import 'package:wallet/screens/set_up/auth_methods/_wrapper.dart';
+import 'package:wallet/screens/set_up/components/step.dart';
+
+class SetUpRestore2SecurityStep extends SetUpStep {
+  const SetUpRestore2SecurityStep({super.key});
+
+  @override
+  int get page => 2;
+
+  @override
+  // name is taken in the SetUpStep via ref
+  // todo think of a better way to do this
+  String get name => '';
+
+  @override
+  Future<bool> Function(WidgetRef ref) get submit => (ref) async {
+        await ref.read(authProvider).save();
+        return true;
+      };
+
+  @override
+  Widget buildContent(BuildContext context, WidgetRef ref) {
+    return const SetUpAuthMethodWrapper();
+  }
+}

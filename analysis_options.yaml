@@ -1,0 +1,27 @@
+include: package:lint/analysis_options.yaml
+
+analyzer:
+  exclude: [build/**, lib/**.freezed.dart, lib/**.g.dart]
+
+linter:
+  rules:
+    omit_local_variable_types: true
+    avoid_classes_with_only_static_members: false
+    prefer_single_quotes: true
+
+    sort_constructors_first: true
+
+    file_names: true
+
+    avoid_setters_without_getters: false
+
+    sort_pub_dependencies: false
+
+    prefer_relative_imports: false
+    depend_on_referenced_packages: true
+
+    # only for debug
+    avoid_print: false
+
+
+

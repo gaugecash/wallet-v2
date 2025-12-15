@@ -1,0 +1,164 @@
+name: wallet
+description: GAU wallet
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+version: 1.0.1+122
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # STATE
+  flutter_hooks: ^0.20.5
+  hooks_riverpod: ^2.5.2
+  auto_route: ^9.2.2
+
+  # UI HELPERS
+  animated_background: ^2.0.0
+  #  websafe_svg: ^2.1.2+2
+  animations: ^2.0.11
+  lucide_icons: ^0.257.0
+  #  boxicons: ^2.1.3
+  #  flutter_phosphor_icons: ^0.0.1+6
+  line_icons: ^2.0.3
+  #  akar_icons_flutter: ^1.1.11
+  #  antdesign_icons: ^0.0.3
+
+  smooth_page_indicator: ^1.2.0
+  # future versions support sms autofill, which requires google services
+  pinput: ^5.0.0
+  animated_digit: ^3.2.3
+  #  extended_sliver: ^2.1.3
+  sliver_tools: ^0.2.12
+  auto_size_text: ^3.0.0
+  #  flutter_multi_formatter: ^2.5.8
+
+  # PLATFORM-SPECIFIC
+  share_plus: ^10.0.2
+  universal_html: ^2.2.3
+  path_provider: ^2.1.4
+  package_info_plus: ^8.0.0
+
+  # package_info_plus:
+  #   git:
+  #     url: https://github.com/fluttercommunity/plus_plugins.git
+  #     path: packages/package_info_plus/package_info_plus
+  #     ref: main
+  #  isolated_worker: ^0.1.0
+  #  url_strategy: ^0.2.0
+
+  flutter_native_splash: ^2.4.1
+  file_picker: ^8.1.2
+  url_launcher: ^6.3.0
+
+  qr_flutter: ^4.1.0
+  #  qr_code_scanner: ^1.0.0
+  mobile_scanner: ^5.2.3
+
+  local_auth: ^2.3.0
+
+  # NICE UTILS
+  # freezed_annotation: any
+  # dartz: ^0.10.1
+  logger: ^2.4.0
+  json_annotation: ^4.9.0
+  intl: ^0.19.0
+  async: any
+
+  # kt_dart: ^0.10.0
+
+  # SERVICES
+  http: ^1.2.2
+
+  # WEB3 & ENCRYPTION
+  dart_web3:
+    git:
+      url: https://github.com/marchellodev/dart_web3.git
+
+  bip39: ^1.0.6
+  # dart_bip32_bip44: ^0.2.0
+  bip32: ^2.0.0
+  convert: ^3.1.1
+  cryptography: ^2.5.0
+  cryptography_flutter: ^2.3.0
+
+  # STORAGE
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  flutter_secure_storage: ^9.2.2
+  dropdown_button2: ^2.3.8
+  # graph_collection: ^2.1.0
+  directed_graph: ^0.4.3
+  eth_sig_util: ^0.0.9
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  lint: ^2.0.1
+
+  build_runner: ^2.4.13
+  #  freezed: any
+  json_serializable: ^6.8.0
+  hive_generator: ^2.0.1
+
+  auto_route_generator: ^9.0.0
+
+  change_app_package_name: ^1.4.0
+
+# flutter pub run flutter_native_splash:create
+flutter_native_splash:
+  color: "#140025"
+  android: false
+  ios: true
+  web: true
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/logo/
+    - assets/icons/
+    #    - .git/HEAD               # This file points out the current branch of the project.
+    #    - .git/ORIG_HEAD          # This file points to the commit id at origin (last commit id of the remote repository).
+    - .git/refs/heads/main # This directory includes files for each branch which points to the last commit id (local repo).
+
+  fonts:
+    - family: Chivo
+      fonts:
+        - asset: assets/fonts/Chivo/Chivo-Light-2.woff
+          weight: 300
+        - asset: assets/fonts/Chivo/Chivo-Medium-2.woff
+          weight: 500
+
+    - family: Mulish
+      fonts:
+        - asset: assets/fonts/Mulish/Mulish-ExtraLight-2.woff
+          weight: 200
+        - asset: assets/fonts/Mulish/Mulish-Regular-2.woff
+          weight: 400
+        - asset: assets/fonts/Mulish/Mulish-Medium-2.woff
+          weight: 500
+        - asset: assets/fonts/Mulish/Mulish-Bold-2.woff
+          weight: 700
+        - asset: assets/fonts/Mulish/Mulish-Black-2.woff
+          weight: 900
+
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins/Poppins-Medium-2.woff
+          weight: 500
+        - asset: assets/fonts/Poppins/Poppins-Bold-2.woff
+          weight: 700
+
+    - family: JetBrainsMono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono/JetBrainsMono-Light-2.woff
+          weight: 300
+        - asset: assets/fonts/JetBrainsMono/JetBrainsMono-Bold-2.woff
+          weight: 700
+
+    - family: AppIcons
+      fonts:
+        - asset: assets/icons/AppIcons.ttf
