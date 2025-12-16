@@ -22,10 +22,10 @@ class TotalWallet extends HookConsumerWidget {
             continue;
           }
 
-          arr.addAll([
-            currency.balance.stream,
-            currency.price.stream,
-          ]);
+          arr.add(currency.balance.stream);
+          if (currency.price != null) {
+            arr.add(currency.price!.stream);
+          }
         }
 
         return StreamZip(arr);

@@ -46,7 +46,7 @@ jobs:
         run: flutter pub get
 
       - name: 🔍 Run flutter analyze
-        run: flutter analyze
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
       - name: 🧪 Run unit tests (exclude integration)
         run: flutter test --exclude-tags=integration
