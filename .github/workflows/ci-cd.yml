@@ -61,6 +61,55 @@ jobs:
           echo "✓ Android build verified"
 
   # ============================================
+  # AUTOMATIC: Deploy Web to Vercel
+  # ============================================
+  deploy-web:
+    name: Deploy Web to Vercel
+    runs-on: ubuntu-latest
+    needs: analyze-and-test
+    if: github.event_name == 'push'
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🔨 Build Flutter Web (Release)
+        run: flutter build web --release
+
+      - name: 📦 Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: 🚀 Deploy to Vercel (Production)
+        run: |
+          cd build/web
+          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} \
+            --scope=${{ secrets.VERCEL_ORG_ID }} \
+            --yes
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: ✅ Deployment Complete
+        run: |
+          echo "╔══════════════════════════════════════════════════════════╗"
+          echo "║  ✅ WEB APP DEPLOYED TO VERCEL SUCCESSFULLY             ║"
+          echo "╚══════════════════════════════════════════════════════════╝"
+          echo ""
+          echo "🌐 Production URL: https://wallet-v2.vercel.app"
+          echo "   (or your custom domain if configured)"
+
+  # ============================================
   # MANUAL: Integration Tests (Mainnet)
   # ============================================
   integration-tests:
