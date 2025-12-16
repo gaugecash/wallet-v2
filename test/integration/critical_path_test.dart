@@ -15,9 +15,10 @@
 @Tags(['integration'])
 library;
 
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 // Test configuration
 const String walletA = '0x92925530b850502aCD618Fae7643b52cAEFF2D4d';
@@ -36,12 +37,18 @@ void main() {
     test('Backend status check', () async {
       final response = await http.get(Uri.parse('$backendUrl/api/status'));
 
-      expect(response.statusCode, equals(200),
-          reason: 'Backend should return 200 OK');
+      expect(
+        response.statusCode,
+        equals(200),
+        reason: 'Backend should return 200 OK',
+      );
 
       final data = json.decode(response.body);
-      expect(data['status'], equals('ok'),
-          reason: 'Backend status should be "ok"');
+      expect(
+        data['status'],
+        equals('ok'),
+        reason: 'Backend status should be "ok"',
+      );
 
       print('✅ Backend health check passed');
     });
@@ -49,8 +56,11 @@ void main() {
     test('Verify backend is reachable', () async {
       final response = await http.get(Uri.parse(backendUrl));
 
-      expect(response.statusCode, lessThan(500),
-          reason: 'Backend should be reachable (not 500)');
+      expect(
+        response.statusCode,
+        lessThan(500),
+        reason: 'Backend should be reachable (not 500)',
+      );
 
       print('✅ Backend is reachable');
     });
@@ -76,8 +86,11 @@ void main() {
       );
 
       // We expect either success or auth failure (missing signature)
-      expect([200, 201, 400, 401].contains(response.statusCode), isTrue,
-          reason: 'Endpoint should exist and respond');
+      expect(
+        [200, 201, 400, 401].contains(response.statusCode),
+        isTrue,
+        reason: 'Endpoint should exist and respond',
+      );
 
       print('✅ GAU Transfer A → B endpoint verified');
     });
@@ -96,8 +109,11 @@ void main() {
         }),
       );
 
-      expect([200, 201, 400, 401].contains(response.statusCode), isTrue,
-          reason: 'Endpoint should exist and respond');
+      expect(
+        [200, 201, 400, 401].contains(response.statusCode),
+        isTrue,
+        reason: 'Endpoint should exist and respond',
+      );
 
       print('✅ GAU Transfer B → A endpoint verified');
     });
@@ -118,8 +134,11 @@ void main() {
         }),
       );
 
-      expect([200, 201, 400, 401].contains(response.statusCode), isTrue,
-          reason: 'USDT transfer endpoint should exist');
+      expect(
+        [200, 201, 400, 401].contains(response.statusCode),
+        isTrue,
+        reason: 'USDT transfer endpoint should exist',
+      );
 
       print('✅ USDT Transfer A → B endpoint verified');
     });
@@ -138,8 +157,11 @@ void main() {
         }),
       );
 
-      expect([200, 201, 400, 401].contains(response.statusCode), isTrue,
-          reason: 'USDT transfer endpoint should exist');
+      expect(
+        [200, 201, 400, 401].contains(response.statusCode),
+        isTrue,
+        reason: 'USDT transfer endpoint should exist',
+      );
 
       print('✅ USDT Transfer B → A endpoint verified');
     });
@@ -156,8 +178,11 @@ void main() {
         }),
       );
 
-      expect([200, 201, 400, 401].contains(response.statusCode), isTrue,
-          reason: 'GAU→USDT swap endpoint should exist');
+      expect(
+        [200, 201, 400, 401].contains(response.statusCode),
+        isTrue,
+        reason: 'GAU→USDT swap endpoint should exist',
+      );
 
       print('✅ GAU → USDT Swap endpoint verified');
     });
@@ -172,8 +197,11 @@ void main() {
         }),
       );
 
-      expect([200, 201, 400, 401].contains(response.statusCode), isTrue,
-          reason: 'USDT→GAU swap endpoint should exist');
+      expect(
+        [200, 201, 400, 401].contains(response.statusCode),
+        isTrue,
+        reason: 'USDT→GAU swap endpoint should exist',
+      );
 
       print('✅ USDT → GAU Swap endpoint verified');
     });
@@ -190,8 +218,11 @@ void main() {
         }),
       );
 
-      expect([200, 201, 400, 401].contains(response.statusCode), isTrue,
-          reason: 'GAU→USDT swap endpoint should exist');
+      expect(
+        [200, 201, 400, 401].contains(response.statusCode),
+        isTrue,
+        reason: 'GAU→USDT swap endpoint should exist',
+      );
 
       print('✅ GAU → USDT Swap from B verified');
     });
@@ -206,8 +237,11 @@ void main() {
         }),
       );
 
-      expect([200, 201, 400, 401].contains(response.statusCode), isTrue,
-          reason: 'USDT→GAU swap endpoint should exist');
+      expect(
+        [200, 201, 400, 401].contains(response.statusCode),
+        isTrue,
+        reason: 'USDT→GAU swap endpoint should exist',
+      );
 
       print('✅ USDT → GAU Swap from B verified');
     });
@@ -217,8 +251,11 @@ void main() {
     test('Verify RelayerV4 address matches expected', () {
       const expectedRelayer = '0xA7E2f9aF0023CF4558Baac747Dd01179297dDE8D';
 
-      expect(relayerV4, equals(expectedRelayer),
-          reason: 'RelayerV4 address must match deployed contract');
+      expect(
+        relayerV4,
+        equals(expectedRelayer),
+        reason: 'RelayerV4 address must match deployed contract',
+      );
 
       print('✅ RelayerV4 address verified: $relayerV4');
     });
@@ -227,15 +264,27 @@ void main() {
       const expectedGau = '0xcBccdf5c97aac84f7536B255B5D35ED57AD363A3';
       const expectedUsdt = '0xc2132D05D31c914a87C6611C10748AEb04B58e8F';
 
-      expect(gauToken, equals(expectedGau),
-          reason: 'GAU token address must match mainnet deployment');
-      expect(usdtToken, equals(expectedUsdt),
-          reason: 'USDT token address must match Polygon mainnet USDT');
+      expect(
+        gauToken,
+        equals(expectedGau),
+        reason: 'GAU token address must match mainnet deployment',
+      );
+      expect(
+        usdtToken,
+        equals(expectedUsdt),
+        reason: 'USDT token address must match Polygon mainnet USDT',
+      );
 
-      expect(gauDecimals, equals(8),
-          reason: 'GAU has 8 decimals');
-      expect(usdtDecimals, equals(6),
-          reason: 'USDT has 6 decimals');
+      expect(
+        gauDecimals,
+        equals(8),
+        reason: 'GAU has 8 decimals',
+      );
+      expect(
+        usdtDecimals,
+        equals(6),
+        reason: 'USDT has 6 decimals',
+      );
 
       print('✅ Token addresses verified');
       print('   GAU:  $gauToken (8 decimals)');
