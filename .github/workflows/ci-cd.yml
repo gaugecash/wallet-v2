@@ -1,0 +1,208 @@
+name: GAUwallet CI/CD
+
+on:
+  # Automatic: Run on every push to main
+  push:
+    branches: [ main ]
+
+  # Manual triggers with action selection
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - 'integration-tests'
+          - 'build-android'
+          - 'build-ios'
+
+env:
+  FLUTTER_VERSION: '3.24.0'
+  JAVA_VERSION: '17'
+
+jobs:
+  # ============================================
+  # AUTOMATIC: Run on every push to main
+  # ============================================
+  analyze-and-test:
+    name: Analyze and Test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    timeout-minutes: 20
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🔍 Run flutter analyze
+        run: flutter analyze
+
+      - name: 🧪 Run unit tests (exclude integration)
+        run: flutter test --exclude-tags=integration
+
+      - name: 🔨 Build Android AAB (debug - verification only)
+        run: flutter build appbundle --debug
+
+      - name: ✅ Success
+        run: |
+          echo "✓ Flutter analyze passed"
+          echo "✓ Unit tests passed"
+          echo "✓ Android build verified"
+
+  # ============================================
+  # MANUAL: Integration Tests (Mainnet)
+  # ============================================
+  integration-tests:
+    name: Integration Tests - Production Backend
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'integration-tests'
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: ⚠️ Mainnet Warning
+        run: |
+          echo "╔══════════════════════════════════════════════════════════╗"
+          echo "║  ⚠️  WARNING: Running tests on PRODUCTION mainnet       ║"
+          echo "║  This will cost real gas (~$0.02-0.05 total)           ║"
+          echo "║  Backend: https://metatx.vercel.app                    ║"
+          echo "║  RelayerV4: 0xA7E2f9aF0023CF4558Baac747Dd01179297dDE8D ║"
+          echo "╚══════════════════════════════════════════════════════════╝"
+          echo ""
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🔥 Run Critical Path Tests
+        run: flutter test test/integration/critical_path_test.dart
+
+      - name: ✅ Integration Tests Passed
+        run: |
+          echo "╔══════════════════════════════════════════════════════════╗"
+          echo "║  ✅ ALL INTEGRATION TESTS PASSED                        ║"
+          echo "║  Production backend is READY for deployment             ║"
+          echo "╚══════════════════════════════════════════════════════════╝"
+
+  # ============================================
+  # MANUAL: Build Android Release AAB
+  # ============================================
+  build-android:
+    name: Build Android Release AAB
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'build-android'
+    timeout-minutes: 30
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🔨 Build Release AAB
+        run: flutter build appbundle --release
+
+      - name: 📤 Upload Release AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release.aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 90
+
+      - name: ✅ Build Complete
+        run: |
+          echo "╔══════════════════════════════════════════════════════════╗"
+          echo "║  ✅ ANDROID RELEASE AAB BUILT SUCCESSFULLY              ║"
+          echo "╚══════════════════════════════════════════════════════════╝"
+          echo ""
+          echo "📦 AAB file location:"
+          echo "   build/app/outputs/bundle/release/app-release.aab"
+          echo ""
+          echo "🚀 Next steps:"
+          echo "   1. Download the AAB artifact from GitHub Actions"
+          echo "   2. Upload to Google Play Console"
+          echo "   3. Submit for review"
+
+  # ============================================
+  # MANUAL: Build iOS Release IPA
+  # ============================================
+  build-ios:
+    name: Build iOS Release IPA
+    runs-on: macos-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'build-ios'
+    timeout-minutes: 45
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🔨 Build IPA (no codesign)
+        run: flutter build ipa --release --no-codesign
+
+      - name: 📤 Upload Build Output
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-output
+          path: build/ios/
+          retention-days: 30
+
+      - name: 📝 Codesigning Instructions
+        run: |
+          echo "╔══════════════════════════════════════════════════════════╗"
+          echo "║  ✅ iOS BUILD SUCCESSFUL (unsigned)                     ║"
+          echo "╚══════════════════════════════════════════════════════════╝"
+          echo ""
+          echo "⚠️  NOTE: This build is NOT signed."
+          echo ""
+          echo "To enable automatic signing, configure these secrets:"
+          echo "   - APPLE_CERTIFICATE (base64 encoded .p12)"
+          echo "   - APPLE_CERTIFICATE_PASSWORD"
+          echo "   - PROVISIONING_PROFILE (base64 encoded .mobileprovision)"
+          echo ""
+          echo "Or manually sign with Xcode:"
+          echo "   1. Open build/ios/archive/*.xcarchive in Xcode"
+          echo "   2. Distribute to App Store"
+          echo "   3. Sign with your Apple Developer account"
