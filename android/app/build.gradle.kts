@@ -11,7 +11,7 @@ plugins {
 android {
     namespace = "com.gaugecash.wallet"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "28.2.13676358"
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -48,12 +48,6 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
-        }
-    }
-
-    packaging {
-        jniLibs {
-            useLegacyPackaging = true
         }
     }
 }
