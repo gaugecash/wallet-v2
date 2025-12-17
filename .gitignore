@@ -30,8 +30,8 @@ ios/Flutter/Flutter.podspec
 # Environment & Secrets
 .env
 .env.*
-*.jks
-*.keystore
+# *.jks - REMOVED: keystore needed for CI/CD (private repo)
+# *.keystore - REMOVED: keystore needed for CI/CD (private repo)
 
 # Vercel
 .vercel/
