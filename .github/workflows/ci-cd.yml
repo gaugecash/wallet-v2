@@ -191,19 +191,33 @@ jobs:
           path: build/app/outputs/bundle/release/app-release.aab
           retention-days: 90
 
+      - name: 🚀 Upload to Google Play (Internal Track)
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.gaugecash.wallet
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
+
       - name: ✅ Build Complete
         run: |
           echo "╔══════════════════════════════════════════════════════════╗"
           echo "║  ✅ ANDROID RELEASE AAB BUILT SUCCESSFULLY              ║"
+          echo "║  ✅ UPLOADED TO GOOGLE PLAY (INTERNAL TRACK)            ║"
           echo "╚══════════════════════════════════════════════════════════╝"
           echo ""
           echo "📦 AAB file location:"
           echo "   build/app/outputs/bundle/release/app-release.aab"
           echo ""
-          echo "🚀 Next steps:"
-          echo "   1. Download the AAB artifact from GitHub Actions"
-          echo "   2. Upload to Google Play Console"
-          echo "   3. Submit for review"
+          echo "🚀 Deployed to:"
+          echo "   - Google Play Console (Internal Testing)"
+          echo "   - GitHub Actions Artifacts (90 day retention)"
+          echo ""
+          echo "📝 Next steps:"
+          echo "   1. Go to Google Play Console"
+          echo "   2. Review the internal release"
+          echo "   3. Promote to production when ready"
 
   # ============================================
   # MANUAL: Build iOS Release IPA
