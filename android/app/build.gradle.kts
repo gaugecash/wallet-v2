@@ -47,7 +47,13 @@ android {
 
     packaging {
         jniLibs {
-            useLegacyPackaging = true
+            useLegacyPackaging = false
+        }
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            force("com.google.mlkit:barcode-scanning:17.3.0")
         }
     }
 
