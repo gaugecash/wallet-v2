@@ -8,6 +8,7 @@
         android:label="GAU"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
+        android:extractNativeLibs="false"
         android:enableOnBackInvokedCallback="true">
         <activity
             android:name=".MainActivity"
