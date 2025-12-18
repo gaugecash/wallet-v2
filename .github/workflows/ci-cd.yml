@@ -18,7 +18,7 @@ on:
           - 'build-ios'
 
 env:
-  FLUTTER_VERSION: '3.24.0'
+  FLUTTER_VERSION: '3.38.5'
   JAVA_VERSION: '17'
 
 jobs:
