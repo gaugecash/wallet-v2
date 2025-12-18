@@ -43,12 +43,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-    }
-
-    packaging {
-        jniLibs {
-            useLegacyPackaging = false
-        }
+        manifestPlaceholders["extractNativeLibs"] = "false"
     }
 
     configurations.all {
@@ -68,6 +63,11 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
+            packaging {
+                jniLibs {
+                    useLegacyPackaging = false
+                }
+            }
             ndk {
                 debugSymbolLevel = "FULL"
             }
