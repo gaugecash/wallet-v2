@@ -46,6 +46,19 @@ android {
         manifestPlaceholders["extractNativeLibs"] = "false"
     }
 
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
+    aaptOptions {
+        noCompress("so")
+    }
+
     configurations.all {
         resolutionStrategy {
             force("com.google.mlkit:barcode-scanning:17.3.0")
@@ -63,11 +76,6 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
-            packaging {
-                jniLibs {
-                    useLegacyPackaging = false
-                }
-            }
             ndk {
                 debugSymbolLevel = "FULL"
             }
