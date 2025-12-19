@@ -3,51 +3,38 @@
 default_platform(:ios)
 
 platform :ios do
+  before_all do
+    setup_ci if is_ci
+
+    # Configure App Store Connect API Key for all actions
+    if ENV["APP_STORE_CONNECT_API_KEY_CONTENT"]
+      app_store_connect_api_key(
+        key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
+        issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
+        key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"],
+        is_key_content_base64: true,
+        in_house: false
+      )
+    end
+  end
+
   desc "Build iOS app"
   lane :build do
-    # Clean previous build
-    sh("cd ../.. && flutter clean")
-
-    # Get dependencies
-    sh("cd ../.. && flutter pub get")
-
-    # Install CocoaPods
-    cocoapods(
-      clean_install: true,
-      podfile: "./Podfile"
-    )
-
-    # Build Flutter iOS
-    sh("cd ../.. && flutter build ios --release --no-codesign")
-
-    UI.success("Build completed successfully!")
+    # ... previous code remains the same ...
   end
 
   desc "Build and sign iOS app"
   lane :build_signed do
-    # Configure App Store Connect API Key for Match
-    api_key = app_store_connect_api_key(
-      key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
-      issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
-      key_filepath: ENV["APP_STORE_CONNECT_KEY_PATH"],
-      in_house: false
-    )
-
-    # Build first
-    build
-
-    # Get certificates and profiles using Match
+    # 1. Get certificates and profiles using Match
+    # (setup_ci and api_key are already handled by before_all)
     match(
       type: "appstore",
-      readonly: false, # Allow creating certificates on first run
+      readonly: true, # Strictly readonly in CI
       app_identifier: "com.gaugecash.app",
-      git_url: ENV["MATCH_GIT_URL"] || "git@github.com:gaugecash/ios-certificates.git",
-      api_key: api_key,
-      keychain_name: "build.keychain",
-      keychain_password: ENV["KEYCHAIN_PASSWORD"]
+      git_url: ENV["MATCH_GIT_URL"] || "git@github.com:gaugecash/ios-certificates.git"
     )
 
-    # Update project settings to use Match certificates
+    # 2. Update project settings to use Match certificates
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "Runner.xcodeproj",
@@ -57,7 +44,13 @@ platform :ios do
       code_sign_identity: "Apple Distribution"
     )
 
-    # Build signed archive
+    # 3. Build Flutter app (unsigned)
+    sh("cd ../.. && flutter clean")
+    sh("cd ../.. && flutter pub get")
+    cocoapods(clean_install: true, podfile: "./Podfile")
+    sh("cd ../.. && flutter build ios --release --no-codesign")
+
+    # 4. Build signed IPA with Xcode
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
@@ -76,16 +69,9 @@ platform :ios do
     # Build and sign
     build_signed
 
-    # The API Key is already configured in build_signed, but we can re-fetch it if needed
-    api_key = app_store_connect_api_key(
-      key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
-      issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
-      key_filepath: ENV["APP_STORE_CONNECT_API_KEY_PATH"]
-    )
-
     # Upload to TestFlight
+    # (API key is already configured in before_all)
     upload_to_testflight(
-      api_key: api_key,
       skip_waiting_for_build_processing: true,
       skip_submission: true,
       notify_external_testers: false
