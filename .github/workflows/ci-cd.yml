@@ -264,6 +264,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.MATCH_GIT_PRIVATE_KEY }}
 
+      - name: 🌐 Add GitHub to Known Hosts
+        run: ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
       - name: 🔐 Setup Code Signing with Match
         run: |
           # Create temporary keychain for Match

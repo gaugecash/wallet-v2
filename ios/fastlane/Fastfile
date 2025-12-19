@@ -34,7 +34,7 @@ platform :ios do
       type: "appstore",
       readonly: false,  # Allow creating new certificates on first run
       app_identifier: "com.gaugecash.app",
-      git_url: ENV["MATCH_GIT_URL"] || "https://github.com/gaugecash/ios-certificates"
+      git_url: ENV["MATCH_GIT_URL"] || "git@github.com:gaugecash/ios-certificates.git"
     )
 
     # Update project settings to use Match certificates
@@ -68,9 +68,9 @@ platform :ios do
 
     # Configure App Store Connect API Key
     api_key = app_store_connect_api_key(
-      key_id: ENV["APP_STORE_CONNECT_KEY_ID"] || "6584299DC9",
-      issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"] || "a5df5dea-2113-4f53-8a1c-6f8251699cfe",
-      key_filepath: ENV["APP_STORE_CONNECT_API_KEY_PATH"] || "./fastlane/keys/AuthKey_6584299DC9.p8",
+      key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
+      key_filepath: ENV["APP_STORE_CONNECT_API_KEY_PATH"],
       in_house: false
     )
 
