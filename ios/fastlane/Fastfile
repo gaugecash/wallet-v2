@@ -1,0 +1,93 @@
+# Fastfile for GAUGECASH iOS Deployment
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Build iOS app"
+  lane :build do
+    # Clean previous build
+    sh("cd ../.. && /Users/manuel/flutter/bin/flutter clean")
+
+    # Get dependencies
+    sh("cd ../.. && /Users/manuel/flutter/bin/flutter pub get")
+
+    # Install CocoaPods
+    cocoapods(
+      clean_install: true,
+      podfile: "./Podfile"
+    )
+
+    # Build Flutter iOS
+    sh("cd ../.. && /Users/manuel/flutter/bin/flutter build ios --release --no-codesign")
+
+    UI.success("Build completed successfully!")
+  end
+
+  desc "Build and sign iOS app"
+  lane :build_signed do
+    # Build first
+    build
+
+    # Get certificates and profiles (using Match)
+    match(
+      type: "appstore",
+      readonly: true,
+      app_identifier: "com.gaugecash.app"
+    )
+
+    # Build signed archive
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      configuration: "Release",
+      clean: false,
+      output_directory: "./build",
+      output_name: "GAUGECASH.ipa"
+    )
+
+    UI.success("Signed build completed!")
+  end
+
+  desc "Deploy to TestFlight"
+  lane :beta do
+    # Build and sign
+    build_signed
+
+    # Upload to TestFlight
+    upload_to_testflight(
+      api_key_path: "./fastlane/keys/AuthKey_6584299DC9.p8",
+      skip_waiting_for_build_processing: true,
+      skip_submission: true,
+      notify_external_testers: false
+    )
+
+    UI.success("Successfully uploaded to TestFlight!")
+  end
+
+  desc "Deploy to App Store"
+  lane :release do
+    # Build and sign
+    build_signed
+
+    # Upload to App Store
+    upload_to_app_store(
+      api_key_path: "./fastlane/keys/AuthKey_6584299DC9.p8",
+      skip_metadata: true,
+      skip_screenshots: true,
+      skip_binary_upload: false,
+      force: true
+    )
+
+    UI.success("Successfully uploaded to App Store!")
+  end
+
+  desc "Setup code signing with Match"
+  lane :setup_signing do
+    match(
+      type: "appstore",
+      app_identifier: "com.gaugecash.app",
+      readonly: false
+    )
+  end
+end

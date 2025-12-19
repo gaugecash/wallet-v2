@@ -223,10 +223,10 @@ jobs:
   # MANUAL: Build iOS Release IPA
   # ============================================
   build-ios:
-    name: Build iOS Release IPA
+    name: Build iOS and Deploy to TestFlight
     runs-on: macos-latest
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'build-ios'
-    timeout-minutes: 45
+    timeout-minutes: 60
 
     steps:
       - name: 📥 Checkout code
@@ -242,30 +242,75 @@ jobs:
       - name: 📦 Install dependencies
         run: flutter pub get
 
-      - name: 🔨 Build IPA (no codesign)
-        run: flutter build ipa --release --no-codesign
+      - name: 🔑 Setup App Store Connect API Key
+        run: |
+          mkdir -p ios/fastlane/keys
+          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" > ios/fastlane/keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
+          chmod 600 ios/fastlane/keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
-      - name: 📤 Upload Build Output
+      - name: 💎 Setup Ruby and Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+          bundler-cache: false
+
+      - name: 📦 Install Fastlane
+        run: |
+          gem install fastlane
+          cd ios && pod install
+
+      - name: 🔐 Import Code Signing Certificates
+        run: |
+          # Create temporary keychain
+          security create-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
+
+          # Import certificate
+          echo "${{ secrets.APPLE_CERTIFICATE }}" | base64 --decode > certificate.p12
+          security import certificate.p12 -k build.keychain -P "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "${{ secrets.KEYCHAIN_PASSWORD }}" build.keychain
+
+          # Import provisioning profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "${{ secrets.PROVISIONING_PROFILE }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+
+      - name: 🔨 Build and Sign IPA
+        run: |
+          cd ios
+          fastlane build_signed
+
+      - name: 🚀 Upload to TestFlight
+        run: |
+          cd ios
+          fastlane beta
+        env:
+          APP_STORE_CONNECT_API_KEY_PATH: ./fastlane/keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+
+      - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ios-build-output
-          path: build/ios/
-          retention-days: 30
+          name: GAUGECASH-ios.ipa
+          path: ios/build/GAUGECASH.ipa
+          retention-days: 90
 
-      - name: 📝 Codesigning Instructions
+      - name: ✅ Deployment Complete
         run: |
           echo "╔══════════════════════════════════════════════════════════╗"
-          echo "║  ✅ iOS BUILD SUCCESSFUL (unsigned)                     ║"
+          echo "║  ✅ iOS APP BUILT AND UPLOADED TO TESTFLIGHT            ║"
           echo "╚══════════════════════════════════════════════════════════╝"
           echo ""
-          echo "⚠️  NOTE: This build is NOT signed."
+          echo "📦 IPA file location:"
+          echo "   ios/build/GAUGECASH.ipa"
           echo ""
-          echo "To enable automatic signing, configure these secrets:"
-          echo "   - APPLE_CERTIFICATE (base64 encoded .p12)"
-          echo "   - APPLE_CERTIFICATE_PASSWORD"
-          echo "   - PROVISIONING_PROFILE (base64 encoded .mobileprovision)"
+          echo "🚀 Deployed to:"
+          echo "   - TestFlight (processing may take 10-15 minutes)"
+          echo "   - GitHub Actions Artifacts (90 day retention)"
           echo ""
-          echo "Or manually sign with Xcode:"
-          echo "   1. Open build/ios/archive/*.xcarchive in Xcode"
-          echo "   2. Distribute to App Store"
-          echo "   3. Sign with your Apple Developer account"
+          echo "📝 Next steps:"
+          echo "   1. Go to App Store Connect"
+          echo "   2. Wait for build processing to complete"
+          echo "   3. Add to testers or submit for review"
