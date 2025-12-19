@@ -42,7 +42,9 @@ platform :ios do
       readonly: false, # Allow creating certificates on first run
       app_identifier: "com.gaugecash.app",
       git_url: ENV["MATCH_GIT_URL"] || "git@github.com:gaugecash/ios-certificates.git",
-      api_key: api_key
+      api_key: api_key,
+      keychain_name: "build.keychain",
+      keychain_password: ENV["KEYCHAIN_PASSWORD"]
     )
 
     # Update project settings to use Match certificates
