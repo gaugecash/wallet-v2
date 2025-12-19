@@ -254,38 +254,37 @@ jobs:
           ruby-version: '3.0'
           bundler-cache: false
 
-      - name: 📦 Install Fastlane
+      - name: 📦 Install Fastlane and CocoaPods
         run: |
           gem install fastlane
           cd ios && pod install
 
-      - name: 🔐 Import Code Signing Certificates
+      - name: 🔐 Setup Code Signing with Match
         run: |
-          # Create temporary keychain
+          # Create temporary keychain for Match
           security create-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" build.keychain
           security set-keychain-settings -t 3600 -u build.keychain
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
 
-          # Import certificate
-          echo "${{ secrets.APPLE_CERTIFICATE }}" | base64 --decode > certificate.p12
-          security import certificate.p12 -k build.keychain -P "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "${{ secrets.KEYCHAIN_PASSWORD }}" build.keychain
-
-          # Import provisioning profile
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "${{ secrets.PROVISIONING_PROFILE }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
-
-      - name: 🔨 Build and Sign IPA
+      - name: 🔨 Build and Sign IPA with Match
         run: |
           cd ios
           fastlane build_signed
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
 
       - name: 🚀 Upload to TestFlight
         run: |
           cd ios
           fastlane beta
         env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           APP_STORE_CONNECT_API_KEY_PATH: ./fastlane/keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}

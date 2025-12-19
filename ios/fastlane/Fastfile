@@ -28,11 +28,23 @@ platform :ios do
     # Build first
     build
 
-    # Get certificates and profiles (using Match)
+    # Get certificates and profiles using Match
+    # First run will create new certificates if none exist
     match(
       type: "appstore",
-      readonly: true,
-      app_identifier: "com.gaugecash.app"
+      readonly: false,  # Allow creating new certificates on first run
+      app_identifier: "com.gaugecash.app",
+      git_url: ENV["MATCH_GIT_URL"] || "https://github.com/gaugecash/ios-certificates"
+    )
+
+    # Update project settings to use Match certificates
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "Runner.xcodeproj",
+      team_id: "MG9USD9QPW",
+      bundle_identifier: "com.gaugecash.app",
+      profile_name: "match AppStore com.gaugecash.app",
+      code_sign_identity: "Apple Distribution"
     )
 
     # Build signed archive

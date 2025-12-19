@@ -1,0 +1,14 @@
+git_url("https://github.com/gaugecash/ios-certificates")
+
+storage_mode("git")
+
+type("appstore") # Can be appstore, adhoc, development, enterprise
+
+app_identifier(["com.gaugecash.app"])
+
+username("manuel@gaugecash.com") # Your Apple Developer Portal email (placeholder)
+
+team_id("MG9USD9QPW")
+
+# For more information about the Matchfile, see:
+# https://docs.fastlane.tools/actions/match/
