@@ -259,6 +259,11 @@ jobs:
           gem install fastlane
           cd ios && pod install
 
+      - name: 🔑 Configure SSH for Match
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.MATCH_GIT_PRIVATE_KEY }}
+
       - name: 🔐 Setup Code Signing with Match
         run: |
           # Create temporary keychain for Match

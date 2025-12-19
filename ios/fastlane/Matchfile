@@ -1,4 +1,4 @@
-git_url("https://github.com/gaugecash/ios-certificates")
+git_url("git@github.com:gaugecash/ios-certificates.git")
 
 storage_mode("git")
 
