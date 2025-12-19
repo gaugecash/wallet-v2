@@ -6,10 +6,10 @@ platform :ios do
   desc "Build iOS app"
   lane :build do
     # Clean previous build
-    sh("cd ../.. && /Users/manuel/flutter/bin/flutter clean")
+    sh("cd ../.. && flutter clean")
 
     # Get dependencies
-    sh("cd ../.. && /Users/manuel/flutter/bin/flutter pub get")
+    sh("cd ../.. && flutter pub get")
 
     # Install CocoaPods
     cocoapods(
@@ -18,7 +18,7 @@ platform :ios do
     )
 
     # Build Flutter iOS
-    sh("cd ../.. && /Users/manuel/flutter/bin/flutter build ios --release --no-codesign")
+    sh("cd ../.. && flutter build ios --release --no-codesign")
 
     UI.success("Build completed successfully!")
   end
@@ -66,9 +66,17 @@ platform :ios do
     # Build and sign
     build_signed
 
+    # Configure App Store Connect API Key
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_KEY_ID"] || "6584299DC9",
+      issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"] || "a5df5dea-2113-4f53-8a1c-6f8251699cfe",
+      key_filepath: ENV["APP_STORE_CONNECT_API_KEY_PATH"] || "./fastlane/keys/AuthKey_6584299DC9.p8",
+      in_house: false
+    )
+
     # Upload to TestFlight
     upload_to_testflight(
-      api_key_path: "./fastlane/keys/AuthKey_6584299DC9.p8",
+      api_key: api_key,
       skip_waiting_for_build_processing: true,
       skip_submission: true,
       notify_external_testers: false
