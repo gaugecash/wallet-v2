@@ -78,19 +78,25 @@ class ReceiveCurrencyTab extends HookConsumerWidget {
         ),
         SliverToBoxAdapter(child: SizedBox(height: GPaddings.small(context))),
         SliverToBoxAdapter(
-          child: QrImageView(
-            data: addr.data.toString(),
-            embeddedImage: const AssetImage('assets/logo/logo_qr.png'),
-            embeddedImageStyle: QrEmbeddedImageStyle(
-              size: wideScreen ? const Size(120, 120) : const Size(75, 75),
-            ),
-            eyeStyle: const QrEyeStyle(
-              eyeShape: QrEyeShape.circle,
-              color: GColors.white,
-            ),
-            dataModuleStyle: const QrDataModuleStyle(
-              dataModuleShape: QrDataModuleShape.square,
-              color: GColors.white,
+          child: Center(
+            child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(20),
+              child: QrImageView(
+                data: addr.data.toString(),
+                size: 280.0,
+                version: QrVersions.auto,
+                errorCorrectionLevel: QrErrorCorrectLevel.H,
+                eyeStyle: const QrEyeStyle(
+                  eyeShape: QrEyeShape.square,
+                  color: Colors.black,
+                ),
+                dataModuleStyle: const QrDataModuleStyle(
+                  dataModuleShape: QrDataModuleShape.square,
+                  color: Colors.black,
+                ),
+                backgroundColor: Colors.white,
+              ),
             ),
           ),
         ),
