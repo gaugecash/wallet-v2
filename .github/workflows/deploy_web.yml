@@ -1,0 +1,32 @@
+name: Build and Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - feature/design-system-overhaul
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build Web
+        run: flutter build web --release --no-tree-shake-icons
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: team_DdMmZhYf90zYjK9PCCQADdcg
+          VERCEL_PROJECT_ID: prj_04Zwq4EXx0Vo6HJRPkN7idnoHTeS
+        run: vercel deploy build/web --token $VERCEL_TOKEN --yes --scope gaugecash
