@@ -125,32 +125,13 @@ flutter:
     - .git/refs/heads/main # This directory includes files for each branch which points to the last commit id (local repo).
 
   fonts:
-    - family: Chivo
+    - family: BodoniModa
       fonts:
-        - asset: assets/fonts/Chivo/Chivo-Light-2.woff
-          weight: 300
-        - asset: assets/fonts/Chivo/Chivo-Medium-2.woff
-          weight: 500
+        - asset: assets/fonts/BodoniModa/BodoniModa-VariableFont_opsz,wght.ttf
 
-    - family: Mulish
+    - family: SpaceGrotesk
       fonts:
-        - asset: assets/fonts/Mulish/Mulish-ExtraLight-2.woff
-          weight: 200
-        - asset: assets/fonts/Mulish/Mulish-Regular-2.woff
-          weight: 400
-        - asset: assets/fonts/Mulish/Mulish-Medium-2.woff
-          weight: 500
-        - asset: assets/fonts/Mulish/Mulish-Bold-2.woff
-          weight: 700
-        - asset: assets/fonts/Mulish/Mulish-Black-2.woff
-          weight: 900
-
-    - family: Poppins
-      fonts:
-        - asset: assets/fonts/Poppins/Poppins-Medium-2.woff
-          weight: 500
-        - asset: assets/fonts/Poppins/Poppins-Bold-2.woff
-          weight: 700
+        - asset: assets/fonts/SpaceGrotesk/SpaceGrotesk-VariableFont_wght.ttf
 
     - family: JetBrainsMono
       fonts:

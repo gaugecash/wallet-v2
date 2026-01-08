@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wallet/components/visuals/guilloche_painter.dart';
 import 'package:wallet/conf.dart';
 import 'package:wallet/styling.dart';
 
@@ -10,10 +11,12 @@ class BaseLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: GColors.abyssDeep, // Ensure base color is correct
       body: Stack(
         children: [
+          // New Design Language Background
           const Positioned.fill(
-            child: _Background(),
+            child: GuillocheBackground(),
           ),
           Positioned.fill(
             child: LayoutBuilder(
@@ -48,36 +51,4 @@ class BaseLayout extends StatelessWidget {
       ),
     );
   }
-}
-
-class _Background extends StatelessWidget {
-  const _Background({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _BackgroundPainter(),
-      isComplex: true,
-    );
-  }
-}
-
-// todo cache the painter as it is somewhat expensive to create
-class _BackgroundPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = GColors.backgroundScaffoldAccent.withOpacity(0.12)
-      ..style = PaintingStyle.fill
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 70);
-
-    canvas.drawCircle(
-      Offset(size.width + 200, size.height / 2),
-      500,
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_BackgroundPainter oldDelegate) => false;
 }

@@ -6,7 +6,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:wallet/components/collections/logo_fullscreen.dart';
+import 'package:wallet/components/visuals/corona_widget.dart';
 import 'package:wallet/conf.dart';
 import 'package:wallet/layouts/base.dart';
 import 'package:wallet/logger.dart';
@@ -94,6 +94,9 @@ class SplashScreen extends HookConsumerWidget {
 
     logger.i('is set up: $isSetUp');
 
+    // Artificial delay to show the animation a bit longer if initialization is too fast
+    await Future.delayed(const Duration(seconds: 2));
+
     if (isSetUp) {
       context.router.replaceNamed('/home');
     } else {
@@ -112,10 +115,14 @@ class SplashScreen extends HookConsumerWidget {
       [],
     );
 
-    return const BaseLayout(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [LogoFullScreenComponent()],
+    return BaseLayout(
+      child: Center(
+        child: CoronaWidget(
+          onLaunch: () {
+            // Interactive launch? For now, handled by _init
+            logger.i("Launch button tapped");
+          },
+        ),
       ),
     );
   }
