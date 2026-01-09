@@ -140,27 +140,24 @@ class _CoronaWidgetState extends State<CoronaWidget>
 
         return Transform.rotate(
           angle: angle,
-          child: Container(
-            width: 300,
-            height: 300,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: SweepGradient(
-                colors: [
-                  GColors.corona.withOpacity(chromaticLayer ? 0.05 : 0.1),
-                  GColors.corona.withOpacity(chromaticLayer ? 0.35 : 0.7),
-                  GColors.coronaGlow.withOpacity(chromaticLayer ? 0.45 : 0.9),
-                  GColors.corona.withOpacity(chromaticLayer ? 0.2 : 0.4),
-                  GColors.corona.withOpacity(chromaticLayer ? 0.05 : 0.1),
-                ],
-                stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
+          child: ClipPath(
+            clipper: _RingClipper(),
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: SweepGradient(
+                  colors: [
+                    GColors.corona.withOpacity(chromaticLayer ? 0.05 : 0.1),
+                    GColors.corona.withOpacity(chromaticLayer ? 0.35 : 0.7),
+                    GColors.coronaGlow.withOpacity(chromaticLayer ? 0.45 : 0.9),
+                    GColors.corona.withOpacity(chromaticLayer ? 0.2 : 0.4),
+                    GColors.corona.withOpacity(chromaticLayer ? 0.05 : 0.1),
+                  ],
+                  stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
+                ),
               ),
-            ),
-            // Masking is harder in Flutter containers,
-            // usually requires CustomPainter for "Ring" shape with gradient.
-            // For MVP we use a simple container, but ideally this is a Painter.
-            child: CustomPaint(
-              painter: _RingMaskPainter(),
             ),
           ),
         );
@@ -220,7 +217,6 @@ class _CoronaWidgetState extends State<CoronaWidget>
               GColors.coronaSoft.withOpacity(0.1),
             ],
           ),
-          border: Border.all(color: GColors.coronaGlow.withOpacity(0.5), width: 1),
           boxShadow: [
             BoxShadow(
               color: GColors.corona.withOpacity(0.2),
@@ -277,25 +273,25 @@ class _OrbitalDotsPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-// Masks the center of the gradient container to make it a ring
-class _RingMaskPainter extends CustomPainter {
+// Clips the container to create a ring shape (donut with hole in center)
+class _RingClipper extends CustomClipper<Path> {
   @override
-  void paint(Canvas canvas, Size size) {
+  Path getClip(Size size) {
+    final path = Path();
     final center = Offset(size.width / 2, size.height / 2);
-    // We want to "clear" the center. 
-    // In Flutter, it's easier to just draw the ring directly than mask.
-    // But since I used Container gradient above, I will just draw a "Hole" if using SaveLayer.
-    // For simplicity in this iteration, I'll assume the gradient is fine as a disc, 
-    // but to make it a ring we apply a BlendMode.dstOut
-    
-    final paint = Paint()
-      ..color = Colors.black
-      ..blendMode = BlendMode.dstOut;
+    final outerRadius = size.width / 2;
+    final innerRadius = outerRadius * 0.40; // 40% hole in center
 
-    // Cut out the middle
-    canvas.drawCircle(center, size.width * 0.40, paint); // 80% thickness
+    // Outer circle
+    path.addOval(Rect.fromCircle(center: center, radius: outerRadius));
+
+    // Inner circle (hole) - using PathFillType.evenOdd to cut it out
+    path.addOval(Rect.fromCircle(center: center, radius: innerRadius));
+    path.fillType = PathFillType.evenOdd;
+
+    return path;
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
