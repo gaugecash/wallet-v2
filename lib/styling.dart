@@ -143,6 +143,7 @@ class GColors {
   
   // Functional
   static const Color prismCyan = Color(0xFF51F0F5);
+  static const Color prismViolet = Color(0xFFB57FE6);
   static const Color champagne = Color(0xFFA8C5FF); // Sapphire Champagne
   static const Color redWarning = Color(0xFFEF4444); // Glow Danger
   static const Color greenSuccess = Color(0xFF10B981);

@@ -33,7 +33,7 @@ class _CoronaWidgetState extends State<CoronaWidget>
 
     _tectonicController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(milliseconds: 1500),
     )..forward();
   }
 
@@ -52,7 +52,7 @@ class _CoronaWidgetState extends State<CoronaWidget>
       animation: _tectonicController,
       builder: (context, child) {
         final curve =
-            CurvedAnimation(parent: _tectonicController, curve: Curves.easeOutQuart);
+            CurvedAnimation(parent: _tectonicController, curve: const Cubic(0.16, 1.0, 0.3, 1.0));
         return Opacity(
           opacity: curve.value,
           child: Transform.translate(
@@ -71,9 +71,8 @@ class _CoronaWidgetState extends State<CoronaWidget>
           // 2. Orbital Ring (35 Currencies)
           _buildOrbitalRing(),
 
-          // 3. The Crystal Corona (Rotating Rings)
-          _buildCoronaRing(false), // Clockwise
-          _buildCoronaRing(true), // Counter-Clockwise
+          // 3. The Crystal Corona (Rotating Rings) with Chromatic Aberration
+          _buildCoronaWithChromaticAberration(),
 
           // 4. Launch Button (Center)
           _buildLaunchButton(),
@@ -132,7 +131,7 @@ class _CoronaWidgetState extends State<CoronaWidget>
     );
   }
 
-  Widget _buildCoronaRing(bool reverse) {
+  Widget _buildCoronaRing(bool reverse, {bool chromaticLayer = false}) {
     return AnimatedBuilder(
       animation: _rotationController,
       builder: (context, child) {
@@ -148,16 +147,16 @@ class _CoronaWidgetState extends State<CoronaWidget>
               shape: BoxShape.circle,
               gradient: SweepGradient(
                 colors: [
-                  GColors.corona.withOpacity(0.1),
-                  GColors.corona.withOpacity(0.7),
-                  GColors.coronaGlow.withOpacity(0.9),
-                  GColors.corona.withOpacity(0.4),
-                  GColors.corona.withOpacity(0.1),
+                  GColors.corona.withOpacity(chromaticLayer ? 0.05 : 0.1),
+                  GColors.corona.withOpacity(chromaticLayer ? 0.35 : 0.7),
+                  GColors.coronaGlow.withOpacity(chromaticLayer ? 0.45 : 0.9),
+                  GColors.corona.withOpacity(chromaticLayer ? 0.2 : 0.4),
+                  GColors.corona.withOpacity(chromaticLayer ? 0.05 : 0.1),
                 ],
                 stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
               ),
             ),
-            // Masking is harder in Flutter containers, 
+            // Masking is harder in Flutter containers,
             // usually requires CustomPainter for "Ring" shape with gradient.
             // For MVP we use a simple container, but ideally this is a Painter.
             child: CustomPaint(
@@ -166,6 +165,42 @@ class _CoronaWidgetState extends State<CoronaWidget>
           ),
         );
       },
+    );
+  }
+
+  // Chromatic Aberration: Stack of corona rings with color offsets
+  Widget _buildCoronaWithChromaticAberration() {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Main Corona Rings
+        _buildCoronaRing(false), // Clockwise
+        _buildCoronaRing(true), // Counter-Clockwise
+
+        // Cyan Prismatic Edge (offset left, screen blend)
+        Transform.translate(
+          offset: const Offset(-2, 0),
+          child: ColorFiltered(
+            colorFilter: ColorFilter.mode(
+              GColors.prismCyan.withOpacity(0.4),
+              BlendMode.screen,
+            ),
+            child: _buildCoronaRing(false, chromaticLayer: true),
+          ),
+        ),
+
+        // Violet Prismatic Edge (offset right, screen blend)
+        Transform.translate(
+          offset: const Offset(2, 0),
+          child: ColorFiltered(
+            colorFilter: ColorFilter.mode(
+              GColors.prismViolet.withOpacity(0.35),
+              BlendMode.screen,
+            ),
+            child: _buildCoronaRing(true, chromaticLayer: true),
+          ),
+        ),
+      ],
     );
   }
 

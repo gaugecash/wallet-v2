@@ -12,7 +12,7 @@ class ObsidianGlass extends StatelessWidget {
   const ObsidianGlass({
     Key? key,
     required this.child,
-    this.blur = 20.0, // Reduced for mobile performance default
+    this.blur = 40.0, // Matches website CSS blur(40px)
     this.borderRadius = 16.0,
     this.padding = const EdgeInsets.all(16.0),
     this.margin,
