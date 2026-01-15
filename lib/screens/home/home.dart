@@ -51,6 +51,7 @@ class HomeScreen extends HookConsumerWidget {
 
     final tabController = useTabController(
       initialLength: length,
+      initialIndex: (investorMode == 'primary') ? 1 : 0,  // Force "Wallet" tab
     );
 
     final mounted = useIsMounted();
