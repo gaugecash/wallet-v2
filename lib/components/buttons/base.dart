@@ -30,18 +30,18 @@ abstract class GButtonBase extends StatelessWidget {
   double get elevation => 0;
 
   ButtonStyle get _style => ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(backgroundColor),
-        shadowColor: MaterialStateProperty.all(border.color),
-        elevation: MaterialStateProperty.all(elevation),
-        shape: MaterialStateProperty.resolveWith(
+        backgroundColor: WidgetStateProperty.all(backgroundColor),
+        shadowColor: WidgetStateProperty.all(border.color),
+        elevation: WidgetStateProperty.all(elevation),
+        shape: WidgetStateProperty.resolveWith(
           (states) {
             var radius = 16.0;
             var border = this.border;
-            final active = <MaterialState>[
-              MaterialState.hovered,
-              MaterialState.selected,
-              MaterialState.focused,
-              MaterialState.pressed,
+            final active = <WidgetState>[
+              WidgetState.hovered,
+              WidgetState.selected,
+              WidgetState.focused,
+              WidgetState.pressed,
             ];
             if (states.containsOne(active)) {
               radius = 22.0;

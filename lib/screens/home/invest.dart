@@ -45,8 +45,6 @@ class GaufInvestScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final wallet = ref.read(walletProvider);
-    final addr = useFuture(useMemoized(() => wallet.wallet!.getAddress(), []));
     final pageController = usePageController();
 
     final currentPage = useState(0);
@@ -146,7 +144,7 @@ class GaufInvestScreen extends HookConsumerWidget {
 }
 
 class _SecondStep extends HookConsumerWidget {
-  const _SecondStep({super.key});
+  const _SecondStep();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -212,7 +210,6 @@ class _GaufSwap extends HookConsumerWidget {
         label: matic.type.ticker,
         controller: maticController,
         keyboardType: const TextInputType.numberWithOptions(
-          signed: false,
           decimal: true,
         ),
         currency: true,
@@ -237,7 +234,6 @@ class _GaufSwap extends HookConsumerWidget {
         label: gauf.type.ticker,
         controller: gaufController,
         keyboardType: const TextInputType.numberWithOptions(
-          signed: false,
           decimal: true,
         ),
         currency: true,
@@ -305,7 +301,7 @@ class _GaufSwap extends HookConsumerWidget {
 }
 
 class _FirstStep extends HookConsumerWidget {
-  const _FirstStep({super.key});
+  const _FirstStep();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

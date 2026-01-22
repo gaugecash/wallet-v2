@@ -9,7 +9,6 @@ import 'package:share_plus/share_plus.dart';
 import 'package:wallet/components/buttons/icon.dart';
 import 'package:wallet/components/dialogs/success.dart';
 import 'package:wallet/components/slivers/spacing.dart';
-import 'package:wallet/conf.dart';
 import 'package:wallet/providers/wallet.dart';
 import 'package:wallet/styling.dart';
 
@@ -26,8 +25,6 @@ class ReceiveCurrencyTab extends HookConsumerWidget {
     if (addr.data == null) {
       return const SizedBox();
     }
-
-    final wideScreen = MediaQuery.of(context).size.width > breakPointWidth;
 
     return CustomScrollView(
       primary: false,
@@ -85,16 +82,7 @@ class ReceiveCurrencyTab extends HookConsumerWidget {
               child: QrImageView(
                 data: addr.data.toString(),
                 size: 280.0,
-                version: QrVersions.auto,
                 errorCorrectionLevel: QrErrorCorrectLevel.H,
-                eyeStyle: const QrEyeStyle(
-                  eyeShape: QrEyeShape.square,
-                  color: Colors.black,
-                ),
-                dataModuleStyle: const QrDataModuleStyle(
-                  dataModuleShape: QrDataModuleShape.square,
-                  color: Colors.black,
-                ),
                 backgroundColor: Colors.white,
               ),
             ),

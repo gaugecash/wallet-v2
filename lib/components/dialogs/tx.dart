@@ -35,15 +35,12 @@ class TxDialog extends HookWidget {
       case TxStatus.sending:
         color = GColors.white.withOpacity(0.2);
         borderColor = GColors.white.withOpacity(0.8);
-        break;
       case TxStatus.error:
         color = GColors.redWarning.withOpacity(0.2);
         borderColor = GColors.redWarningBorder.withOpacity(0.8);
-        break;
       case TxStatus.sent:
         color = GColors.greenSuccess.withOpacity(0.2);
         borderColor = GColors.greenSuccessBorder.withOpacity(0.8);
-        break;
     }
 
     return BoxDecoration(
@@ -73,7 +70,7 @@ class TxDialog extends HookWidget {
                 overflow: TextOverflow.ellipsis,
                 style: GTextStyles.mulishBoldAlert,
               ),
-            )
+            ),
           ],
         ),
       ],
@@ -100,7 +97,7 @@ class TxDialog extends HookWidget {
                 overflow: TextOverflow.ellipsis,
                 style: GTextStyles.mulishBoldAlert,
               ),
-            )
+            ),
           ],
         ),
         Row(
@@ -117,7 +114,7 @@ class TxDialog extends HookWidget {
                 overflow: TextOverflow.ellipsis,
                 style: GTextStyles.monoTx,
               ),
-            )
+            ),
           ],
         ),
       ],
@@ -138,9 +135,8 @@ class TxDialog extends HookWidget {
     final tx = useFuture(this.tx);
     final events = tx.data?.events;
 
-    AsyncSnapshot<TxEvent>? eventStream;
     if (events != null) {
-      eventStream = useStream(useMemoized(() => events.stream));
+      useStream(useMemoized(() => events.stream));
     }
 
     late TxEvent status;
@@ -239,7 +235,7 @@ class TxDialog extends HookWidget {
                               Navigator.of(context).pop();
                             },
                           ),
-                        ]
+                        ],
                       ],
                     ),
                   ),

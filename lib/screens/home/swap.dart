@@ -24,18 +24,17 @@ class SwapScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final wallet = ref.read(walletProvider);
-    final addr = useFuture(useMemoized(() => wallet.wallet!.getAddress(), []));
+    final provider = ref.read(walletProvider);
 
-    final gau = wallet.currencies!.firstWhere(
+    final gau = provider.currencies!.firstWhere(
       (el) => el.type == CurrencyTicker.gau,
     );
 
-    final usdt = wallet.currencies!.firstWhere(
+    final usdt = provider.currencies!.firstWhere(
       (el) => el.type == CurrencyTicker.usdt,
     );
 
-    final matic = wallet.currencies!.firstWhere(
+    final matic = provider.currencies!.firstWhere(
       (el) => el.type == CurrencyTicker.matic,
     );
 

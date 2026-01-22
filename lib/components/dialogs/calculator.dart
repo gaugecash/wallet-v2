@@ -80,7 +80,6 @@ class _CalculatorDialog extends HookConsumerWidget {
             label: 'GAU',
             controller: gau,
             keyboardType: const TextInputType.numberWithOptions(
-              signed: false,
               decimal: true,
             ),
             currency: true,
@@ -100,7 +99,6 @@ class _CalculatorDialog extends HookConsumerWidget {
             label: 'USD',
             controller: usd,
             keyboardType: const TextInputType.numberWithOptions(
-              signed: false,
               decimal: true,
             ),
             currency: true,

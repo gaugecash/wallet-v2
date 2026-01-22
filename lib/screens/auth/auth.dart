@@ -16,8 +16,6 @@ class AuthScreen extends HookConsumerWidget {
         return const AuthPinCodeComponent();
       case AuthMethod.localAuth:
         return const AuthLocalAuthComponent();
-      default:
-        throw Exception('Unknown AuthMethod');
     }
   }
 

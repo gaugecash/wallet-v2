@@ -131,7 +131,7 @@ abstract class CoinRepository {
   }
 
   Future<double> estimateAny(double amount, CurrencyTicker c1,
-      CurrencyTicker c2, WidgetRef ref) async {
+      CurrencyTicker c2, WidgetRef ref,) async {
     // final wei = BigInt.from(data.amount * pow(10, 18))
     // final value = EtherAmount.fromUnitAndValue(EtherUnit.wei, wei);
 

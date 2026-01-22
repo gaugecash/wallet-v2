@@ -21,7 +21,7 @@ class BaseLayout extends StatelessWidget {
           Positioned.fill(
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
-                final _child = SafeArea(
+                final content = SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 26,
@@ -37,13 +37,13 @@ class BaseLayout extends StatelessWidget {
                       constraints: BoxConstraints(maxWidth: breakPointWidth.toDouble()),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 34),
-                        child: _child,
+                        child: content,
                       ),
                     ),
                   );
                 }
 
-                return _child;
+                return content;
               },
             ),
           ),

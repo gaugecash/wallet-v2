@@ -174,11 +174,11 @@ class MetaTx {
     final functionSignature = to != null
         ? usdtCoin.self.function('transfer').encodeCall([
             EthereumAddress.fromHex(mainMetaTxSpender),  // Transfer to relayer (RelayerV4)
-            amount
+            amount,
           ])
         : usdtCoin.self.function('approve').encodeCall([
             EthereumAddress.fromHex(mainMetaTxSpender),
-            amount
+            amount,
           ]);
 
     final payload = {

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wallet/components/alerts/info_alert.dart';
 import 'package:wallet/components/alerts/success_alert.dart';
 import 'package:wallet/components/buttons/_sizes.dart';
@@ -13,7 +12,6 @@ import 'package:wallet/components/expansion_tile.dart';
 import 'package:wallet/components/slivers/spacing.dart';
 import 'package:wallet/conf.dart';
 import 'package:wallet/layouts/app_layout_sliver.dart';
-import 'package:wallet/logger.dart';
 import 'package:wallet/model_components/balance_compact.dart';
 import 'package:wallet/models/currency.dart';
 import 'package:wallet/providers/wallet.dart';
@@ -43,8 +41,6 @@ class BuyGauScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final wallet = ref.read(walletProvider);
-    final addr = useFuture(useMemoized(() => wallet.wallet!.getAddress(), []));
     final pageController = usePageController();
 
     final currentPage = useState(0);
@@ -57,9 +53,6 @@ class BuyGauScreen extends HookConsumerWidget {
     final usdt = ref.read(walletProvider).currencies!.firstWhere(
           (element) => element.type == CurrencyTicker.usdt,
         );
-
-    final maticBalance =
-        useStream(matic.balance.stream, initialData: matic.balance.lastValue);
 
     final usdtBalance =
         useStream(usdt.balance.stream, initialData: usdt.balance.lastValue);
@@ -170,7 +163,7 @@ class BuyGauScreen extends HookConsumerWidget {
 }
 
 class _ThirdStep extends HookConsumerWidget {
-  const _ThirdStep({super.key});
+  const _ThirdStep();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -205,13 +198,10 @@ class _ThirdStep extends HookConsumerWidget {
 }
 
 class _SecondStep extends HookConsumerWidget {
-  const _SecondStep({super.key});
+  const _SecondStep();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final wallet = ref.read(walletProvider);
-    final addr = useFuture(useMemoized(() => wallet.wallet!.getAddress(), []));
-
     final usdt = ref.read(walletProvider).currencies!.firstWhere(
           (element) => element.type == CurrencyTicker.usdt,
         );

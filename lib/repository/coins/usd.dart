@@ -6,7 +6,6 @@ import 'package:wallet/logger.dart';
 import 'package:wallet/models/tx.dart';
 import 'package:wallet/repository/abi/gau.g.dart';
 import 'package:wallet/repository/abi/link.g.dart';
-import 'package:wallet/repository/abi/usdt.g.dart';
 import 'package:wallet/repository/coins/coin.dart';
 import 'package:wallet/repository/gas_station.dart';
 import 'package:wallet/repository/meta_tx.dart';

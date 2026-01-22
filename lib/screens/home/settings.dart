@@ -142,7 +142,7 @@ class SettingsScreen extends HookConsumerWidget {
                 ),
               ),
               value: enableExchange == 'true',
-              activeColor: GColors.white,
+              thumbColor: WidgetStateProperty.all(GColors.white),
               // inactiveThumbColor: GColors.white.withOpacity(0.4),
               onChanged: (bool? value) async {
                 await Hive.box<String>(safeBox).put(
@@ -179,7 +179,7 @@ class SettingsScreen extends HookConsumerWidget {
               ),
             ),
             value: investorMode != 'false',
-            activeColor: GColors.white,
+            thumbColor: WidgetStateProperty.all(GColors.white),
             // inactiveThumbColor: GColors.white.withOpacity(0.4),
             onChanged: (bool? value) async {
               await Hive.box<String>(safeBox).put(

@@ -81,7 +81,7 @@ class GPrimaryInput extends HookWidget {
       ),
       style: GTextStyles.poppinsMediumButton,
       inputFormatters: currency
-          ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))]
+          ? [FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))]
           : [],
     );
   }

@@ -39,7 +39,7 @@ class SetUpRestoreScreen extends StatelessWidget {
 }
 
 class _SetUpWrapperScreen extends HookConsumerWidget {
-  const _SetUpWrapperScreen(this.action, {super.key});
+  const _SetUpWrapperScreen(this.action);
 
   final SetUpAction action;
 
@@ -80,8 +80,8 @@ class _SetUpWrapperScreen extends HookConsumerWidget {
 
     useEffect(
       () {
-        ref.refresh(setUpCreateProvider);
-        ref.refresh(setUpRestoreProvider);
+        ref.invalidate(setUpCreateProvider);
+        ref.invalidate(setUpRestoreProvider);
         return null;
       },
       [],

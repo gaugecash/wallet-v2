@@ -237,7 +237,7 @@ class ConfigurableExpansionTileState extends State<ConfigurableExpansionTile>
                       turns: _iconTurns,
                       child:
                           widget.animatedWidgetFollowingHeader ?? Container(),
-                    )
+                    ),
                   ],
                 ),
               ),

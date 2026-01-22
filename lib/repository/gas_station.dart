@@ -31,9 +31,9 @@ class GasStation {
   static Future<GasResults> getGas() async {
     final station = await _getGasStation();
 
-    final maxFee = station.fast.maxFee.runtimeType == String
+    final maxFee = (station.fast.maxFee is String)
         ? double.parse(station.fast.maxFee as String)
-        : station.fast.maxFee as double;
+        : (station.fast.maxFee as num).toDouble();
 
     final maxFeePerGasWei = (maxFee * _gasAhead) * pow(10, 9);
     // final maxPriorityFeePerGasWei =
@@ -42,9 +42,9 @@ class GasStation {
 
     // final maxPriorityFee = double.parse(station.fast.maxPriorityFee);
 
-    final maxPriorityFee = station.fast.maxPriorityFee.runtimeType == String
-        ? double.parse(station.fast.maxFee as String)
-        : station.fast.maxFee as double;
+    final maxPriorityFee = (station.fast.maxPriorityFee is String)
+        ? double.parse(station.fast.maxPriorityFee as String)
+        : (station.fast.maxPriorityFee as num).toDouble();
 
     final maxPriorityFeePerGasWei =
         (maxPriorityFee * _gasAhead) * pow(10, 9);

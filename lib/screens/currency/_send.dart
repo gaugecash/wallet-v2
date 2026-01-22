@@ -40,7 +40,6 @@ class SendCurrencyTab extends HookWidget {
             controller: amount,
             keyboardType: const TextInputType.numberWithOptions(
               decimal: true,
-              signed: false,
             ),
             suffix: IconButton(
               icon: const Icon(
@@ -63,7 +62,6 @@ class SendCurrencyTab extends HookWidget {
             controller: amount,
             keyboardType: const TextInputType.numberWithOptions(
               decimal: true,
-              signed: false,
             ),
             currency: true,
           );
@@ -83,7 +81,7 @@ class SendCurrencyTab extends HookWidget {
               onPressed: () async {
                 final qr = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => QRScreen()),
+                  MaterialPageRoute(builder: (_) => const QRScreen()),
                 );
                 if (qr is String) {
                   addr.text = qr;

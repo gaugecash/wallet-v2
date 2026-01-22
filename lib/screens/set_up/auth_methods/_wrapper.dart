@@ -15,8 +15,6 @@ class SetUpAuthMethodWrapper extends HookConsumerWidget {
         return const SetUpPinCodeAuth();
       case AuthMethod.localAuth:
         return const SetUpLocalAuth();
-      default:
-        throw Exception('Unknown AuthMethod');
     }
   }
 }

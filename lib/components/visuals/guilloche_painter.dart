@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 class GuillocheBackground extends StatefulWidget {
-  const GuillocheBackground({Key? key}) : super(key: key);
+  const GuillocheBackground({super.key});
 
   @override
   State<GuillocheBackground> createState() => _GuillocheBackgroundState();
@@ -43,9 +43,9 @@ class _GuillocheBackgroundState extends State<GuillocheBackground>
 }
 
 class _GuillochePainter extends CustomPainter {
-  final double time;
 
   _GuillochePainter({required this.time});
+  final double time;
 
   // Rose Gold palette
   static const List<Color> roseGoldColors = [
@@ -73,7 +73,7 @@ class _GuillochePainter extends CustomPainter {
       _Layer(frequency: 0.015, amplitude: 40, phase: math.pi / 2, opacity: 0.07, colorIndex: 3),
     ];
 
-    for (var layer in layers) {
+    for (final layer in layers) {
       final color = roseGoldColors[layer.colorIndex];
       
       // Draw concentric guilloché curves
@@ -85,7 +85,7 @@ class _GuillochePainter extends CustomPainter {
         final breathScale = 1 + math.sin(time * 2 + r * 0.01) * 0.03;
         final adjustedR = r * breathScale;
 
-        bool firstPoint = true;
+        var firstPoint = true;
 
         // Resolution of the curve
         for (double angle = 0; angle < math.pi * 2; angle += 0.015) {
@@ -102,7 +102,7 @@ class _GuillochePainter extends CustomPainter {
             curvatureAngle * (8 + layer.frequency * 1000) + 
             layer.phase + 
             time + 
-            r * layer.frequency
+            r * layer.frequency,
           ) * layer.amplitude * (1 - gravityPull * 0.8);
 
           final finalR = adjustedR + waveOffset;
@@ -137,11 +137,6 @@ class _GuillochePainter extends CustomPainter {
 }
 
 class _Layer {
-  final double frequency;
-  final double amplitude;
-  final double phase;
-  final double opacity;
-  final int colorIndex;
 
   _Layer({
     required this.frequency,
@@ -150,4 +145,9 @@ class _Layer {
     required this.opacity,
     required this.colorIndex,
   });
+  final double frequency;
+  final double amplitude;
+  final double phase;
+  final double opacity;
+  final int colorIndex;
 }

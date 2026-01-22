@@ -37,7 +37,7 @@ WeightedDirectedGraph<CurrencyTicker, GraphStruct> get constructSimpleSwapGraph 
               final wallet = args.ref.read(walletProvider);
               final rate = wallet.currencies!.firstWhere((el) => el.type == CurrencyTicker.gau).price!.lastValue!;
               final valueDecimals = args.amount / BigInt.from(10).pow(gauDecimals);
-              final usdValue = valueDecimals * rate!;
+              final usdValue = valueDecimals * rate;
 
               final usdBig = BigInt.from(usdValue * pow(10, usdtDecimals));
 
@@ -246,7 +246,7 @@ WeightedDirectedGraph<CurrencyTicker, GraphStruct> get constructSimpleSwapGraph 
             GraphStruct((GraphArgs args) => doUniswap(args, mainUniswapAave, mainUsdcAddress, FeeLevels.l03)),
         CurrencyTicker.weth:
             GraphStruct((GraphArgs args) => doUniswap(args, mainUniswapAave, mainUniswapWeth, FeeLevels.l03)),
-      }
+      },
     },
     summation: (a, b) => GraphStruct(
       (GraphArgs args) async => ('', BigInt.zero),

@@ -10,8 +10,6 @@ import 'package:wallet/model_components/balance_swap.dart';
 import 'package:wallet/models/currency.dart';
 import 'package:wallet/models/tx.dart';
 import 'package:wallet/providers/wallet.dart';
-import 'package:wallet/repository/coins/matic.dart';
-import 'package:wallet/repository/coins/usd.dart';
 
 class SwapMaticFragment extends HookConsumerWidget {
   const SwapMaticFragment({super.key});
@@ -52,7 +50,6 @@ class SwapMaticFragment extends HookConsumerWidget {
         label: matic.type.ticker,
         controller: maticController,
         keyboardType: const TextInputType.numberWithOptions(
-          signed: false,
           decimal: true,
         ),
         currency: true,
@@ -61,9 +58,6 @@ class SwapMaticFragment extends HookConsumerWidget {
           final maticVal = double.tryParse(str);
           if (maticVal == null) {
             usdtController.clear();
-            return;
-          }
-          if (maticPriceInUsdt == null) {
             return;
           }
           // // todo: [CRITICAL]: think of the rounding, it should be up, probably?
@@ -78,7 +72,6 @@ class SwapMaticFragment extends HookConsumerWidget {
         label: usdt.type.ticker,
         controller: usdtController,
         keyboardType: const TextInputType.numberWithOptions(
-          signed: false,
           decimal: true,
         ),
         currency: true,
@@ -87,9 +80,6 @@ class SwapMaticFragment extends HookConsumerWidget {
           final usdtVal = double.tryParse(str);
           if (usdtVal == null) {
             maticController.clear();
-            return;
-          }
-          if (maticPriceInUsdt == null) {
             return;
           }
           // todo: [CRITICAL]: think of the rounding, it should be up, probably?

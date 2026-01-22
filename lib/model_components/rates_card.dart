@@ -17,19 +17,19 @@ class RatesCard extends ConsumerWidget {
   ButtonStyle get _style => ButtonStyle(
         // backgroundColor: MaterialStateProperty.all(backgroundColor),
         // shadowColor: MaterialStateProperty.all(border.color),
-        elevation: MaterialStateProperty.all(0),
-        shape: MaterialStateProperty.resolveWith(
+        elevation: WidgetStateProperty.all(0),
+        shape: WidgetStateProperty.resolveWith(
           (states) {
             var radius = 18.0;
             final border = BorderSide(
               color: GColors.white.withOpacity(0.9),
               width: 2,
             );
-            final active = <MaterialState>[
-              MaterialState.hovered,
-              MaterialState.selected,
-              MaterialState.focused,
-              MaterialState.pressed,
+            final active = <WidgetState>[
+              WidgetState.hovered,
+              WidgetState.selected,
+              WidgetState.focused,
+              WidgetState.pressed,
             ];
             if (states.containsOne(active)) {
               radius = 22.0;

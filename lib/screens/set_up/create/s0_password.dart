@@ -67,10 +67,15 @@ class SetUpCreate0PasswordStep extends SetUpStep {
     final password = useTextEditingController();
     final passwordRepeat = useTextEditingController();
 
-    if (!password.hasListeners) {
-      password.addListener(() => listener(password, passwordRepeat, ref));
-      passwordRepeat.addListener(() => listener(password, passwordRepeat, ref));
-    }
+    useEffect(() {
+      void localListener() => listener(password, passwordRepeat, ref);
+      password.addListener(localListener);
+      passwordRepeat.addListener(localListener);
+      return () {
+        password.removeListener(localListener);
+        passwordRepeat.removeListener(localListener);
+      };
+    }, [password, passwordRepeat],);
 
     return Column(
       children: [

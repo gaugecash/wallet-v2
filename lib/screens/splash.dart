@@ -120,7 +120,7 @@ class SplashScreen extends HookConsumerWidget {
         child: CoronaWidget(
           onLaunch: () {
             // Interactive launch? For now, handled by _init
-            logger.i("Launch button tapped");
+            logger.i('Launch button tapped');
           },
         ),
       ),

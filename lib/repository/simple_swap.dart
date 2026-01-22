@@ -2,7 +2,6 @@
 
 import 'dart:math';
 
-import 'package:directed_graph/directed_graph.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wallet/conf.dart';
 import 'package:wallet/logger.dart';

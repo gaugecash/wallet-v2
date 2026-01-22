@@ -5,7 +5,6 @@ import 'package:wallet/styling.dart';
 
 void showErrorDialog(BuildContext context, String? message) {
   showDialog(
-    barrierDismissible: true,
     barrierColor: Colors.black.withOpacity(0.6),
     context: context,
     builder: (BuildContext context) {

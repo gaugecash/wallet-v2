@@ -43,7 +43,7 @@ class AppLayoutSliver extends StatelessWidget {
               slivers: children,
             ),
           ),
-        )
+        ),
       ];
     }
 

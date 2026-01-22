@@ -25,7 +25,7 @@ class NetworkErrorScreen extends StatelessWidget {
               context.router.pushNamed('/');
               context.router.removeWhere((route) => route.path != '/');
             },
-          )
+          ),
         ],
       ),
     );

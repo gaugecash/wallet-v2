@@ -22,18 +22,18 @@ class GenericDialog extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mounted = useIsMounted();
     useEffect(
       () {
         if (autoDismiss == null) {
-          return;
+          return null;
         }
 
         Future.delayed(autoDismiss!, () {
-          if (mounted() &&
-              ModalRoute.of(context) != null &&
-              ModalRoute.of(context)!.isCurrent) {
-            Navigator.of(context).pop();
+          if (context.mounted) {
+            final route = ModalRoute.of(context);
+            if (route != null && route.isCurrent) {
+              Navigator.of(context).pop();
+            }
           }
         });
 
@@ -42,8 +42,8 @@ class GenericDialog extends HookWidget {
       [],
     );
 
-    return WillPopScope(
-      onWillPop: () => Future.value(dismissible),
+    return PopScope(
+      canPop: dismissible,
       child: GestureDetector(
         onTap: () {
           if (dismissible) {

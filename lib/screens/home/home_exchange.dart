@@ -158,7 +158,7 @@ class HomePageExchangeFragment extends HookConsumerWidget {
         for (final currency in wallet.currencies!.where((element) => !element.investOnly)) ...[
           GPaddingsLayoutHorizontal.sliver(
             child: Hero(
-              tag: currency.type.ticker + '_exchange',
+              tag: '${currency.type.ticker}_exchange',
               child: BalanceCard(
                 small: currency.type != CurrencyTicker.gau,
                 heightVal: 60,
@@ -271,7 +271,6 @@ class _ExchangeCoin extends HookConsumerWidget {
                     label: type == Type.give ? 'You Pay' : 'You Get',
                     controller: coinController,
                     keyboardType: const TextInputType.numberWithOptions(
-                      signed: false,
                       decimal: true,
                     ),
                     currency: true,
@@ -333,7 +332,7 @@ class _ExchangeCoin extends HookConsumerWidget {
                 borderRadius: BorderRadius.circular(16),
                 color: Colors.transparent,
               ),
-              overlayColor: const MaterialStatePropertyAll(Colors.transparent),
+              overlayColor: const WidgetStatePropertyAll(Colors.transparent),
             ),
             dropdownStyleData: DropdownStyleData(
               elevation: 24,

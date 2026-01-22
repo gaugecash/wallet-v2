@@ -73,9 +73,11 @@ class SetUpRestore1PasswordStep extends SetUpStep {
   Widget buildContent(BuildContext context, WidgetRef ref) {
     final password = useTextEditingController();
 
-    if (!password.hasListeners) {
-      password.addListener(() => listener(password, ref));
-    }
+    useEffect(() {
+      void localListener() => listener(password, ref);
+      password.addListener(localListener);
+      return () => password.removeListener(localListener);
+    }, [password],);
 
     return Column(
       children: [

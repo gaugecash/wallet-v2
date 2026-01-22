@@ -128,7 +128,7 @@ class BalanceSwapCard extends GButtonBase {
             color: GColors.white,
           ),
           const SizedBox(width: 24),
-        ]
+        ],
       ],
     );
   }

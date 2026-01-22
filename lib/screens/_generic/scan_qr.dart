@@ -5,10 +5,22 @@ import 'package:wallet/components/buttons/icon.dart';
 import 'package:wallet/logger.dart';
 import 'package:wallet/styling.dart';
 
-class QRScreen extends StatelessWidget {
-  final MobileScannerController cameraController = MobileScannerController();
+class QRScreen extends StatefulWidget {
+  const QRScreen({super.key});
 
+  @override
+  State<QRScreen> createState() => _QRScreenState();
+}
+
+class _QRScreenState extends State<QRScreen> {
+  final MobileScannerController cameraController = MobileScannerController();
   bool popped = false;
+
+  @override
+  void dispose() {
+    cameraController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +48,6 @@ class QRScreen extends StatelessWidget {
                         child: GIconButton(
                           onPressed: () async {
                             cameraController.toggleTorch();
-                            // await controller?.toggleFlash();
-                            // setState(() {});
                           },
                           icon: LucideIcons.flashlight,
                         ),
@@ -59,8 +69,6 @@ class QRScreen extends StatelessWidget {
                         child: GIconButton(
                           icon: LucideIcons.switchCamera,
                           onPressed: () async {
-                            // await controller?.flipCamera();
-                            // setState(() {});
                             cameraController.switchCamera();
                           },
                         ),
@@ -78,7 +86,6 @@ class QRScreen extends StatelessWidget {
 
   Widget _buildQrView(BuildContext context) {
     return MobileScanner(
-      // allowDuplicates: false,
       controller: cameraController,
       onDetect: (barcodes) {
         if (barcodes.barcodes.isEmpty) return;
@@ -88,9 +95,9 @@ class QRScreen extends StatelessWidget {
             logger.e('Failed to scan Barcode');
           } else {
             if (popped) return;
-            // print('BARCODE: ${code.rawValue} $popped');
-            popped = true;
-            // debugPrint('Barcode found! $code');
+            setState(() {
+              popped = true;
+            });
             Navigator.of(context).pop(code.rawValue);
           }
         }

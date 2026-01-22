@@ -10,7 +10,6 @@ import 'package:wallet/styling.dart';
 
 void showPolygonReminderDialog(BuildContext context) {
   showDialog(
-    barrierDismissible: true,
     barrierColor: Colors.black.withOpacity(0.6),
     context: context,
     builder: (BuildContext context) {

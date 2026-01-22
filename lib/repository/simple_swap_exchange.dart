@@ -57,7 +57,7 @@ class SimpleSwapExchangeFunctions {
           addr, // recipient
           amount, // amount in
           BigInt.from(0), // amount out minimum
-          BigInt.from(0) // sqrt price limit x96
+          BigInt.from(0), // sqrt price limit x96
         ],
         credentials: creds,
         transaction: Transaction(

@@ -45,7 +45,7 @@ class LearnMoreTemplate extends HookWidget {
               colors: [
                 GColors.cardBackground.withOpacity(1),
                 GColors.backgroundScaffoldAccent.withOpacity(0.5),
-                GColors.backgroundScaffoldAccent.withOpacity(1)
+                GColors.backgroundScaffoldAccent.withOpacity(1),
               ],
             ),
           ),

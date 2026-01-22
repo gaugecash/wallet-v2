@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:wallet/styling.dart';
 
 class CoronaWidget extends StatefulWidget {
-  final VoidCallback onLaunch;
 
-  const CoronaWidget({Key? key, required this.onLaunch}) : super(key: key);
+  const CoronaWidget({super.key, required this.onLaunch});
+  final VoidCallback onLaunch;
 
   @override
   State<CoronaWidget> createState() => _CoronaWidgetState();
@@ -86,13 +86,13 @@ class _CoronaWidgetState extends State<CoronaWidget>
       animation: _pulseController,
       builder: (context, child) {
         // Calculate shifted value for stagger
-        double value = (_pulseController.value + (delay / 5)) % 1.0;
+        final value = (_pulseController.value + (delay / 5)) % 1.0;
         
         // Custom curve: fast out, slow decay
         // Scale 1 -> 3
-        double scale = 1.0 + (value * 2.5); 
+        final scale = 1.0 + (value * 2.5); 
         // Opacity 0.5 -> 0
-        double opacity = (1.0 - value) * 0.5;
+        final opacity = (1.0 - value) * 0.5;
 
         return Transform.scale(
           scale: scale,
@@ -135,7 +135,7 @@ class _CoronaWidgetState extends State<CoronaWidget>
     return AnimatedBuilder(
       animation: _rotationController,
       builder: (context, child) {
-        double angle = _rotationController.value * 2 * math.pi;
+        var angle = _rotationController.value * 2 * math.pi;
         if (reverse) angle = -angle * 0.8; // Reverse is slightly slower
 
         return Transform.rotate(
@@ -222,14 +222,14 @@ class _CoronaWidgetState extends State<CoronaWidget>
               color: GColors.corona.withOpacity(0.2),
               blurRadius: 20,
               spreadRadius: 5,
-            )
+            ),
           ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "LAUNCH",
+              'LAUNCH',
               style: GTextStyles.buttonMedium.copyWith(
                 color: GColors.champagne,
                 letterSpacing: 2.0,
@@ -238,7 +238,7 @@ class _CoronaWidgetState extends State<CoronaWidget>
             ),
             const SizedBox(height: 4),
             Text(
-              "GAU",
+              'GAU',
               style: GTextStyles.monoRegular.copyWith(
                 color: GColors.coronaGlow.withOpacity(0.8),
                 fontSize: 10,
@@ -260,7 +260,7 @@ class _OrbitalDotsPainter extends CustomPainter {
     final radius = size.width / 2;
     final paint = Paint()..color = GColors.coronaGlow;
 
-    for (int i = 0; i < 35; i++) {
+    for (var i = 0; i < 35; i++) {
       final angle = (i / 35) * 2 * math.pi;
       final x = center.dx + radius * math.cos(angle);
       final y = center.dy + radius * math.sin(angle);

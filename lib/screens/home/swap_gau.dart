@@ -21,7 +21,6 @@ class SwapGauFragment extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final wallet = ref.read(walletProvider);
-    final addr = useFuture(useMemoized(() => wallet.wallet!.getAddress(), []));
 
     final gau = wallet.currencies!.firstWhere(
       (el) => el.type == CurrencyTicker.gau,
@@ -72,7 +71,6 @@ class SwapGauFragment extends HookConsumerWidget {
         label: gau.type.ticker,
         controller: gauController,
         keyboardType: const TextInputType.numberWithOptions(
-          signed: false,
           decimal: true,
         ),
         currency: true,
@@ -98,9 +96,6 @@ class SwapGauFragment extends HookConsumerWidget {
             maticController.clear();
             return;
           }
-          if (gauPriceInMatic == null) {
-            return;
-          }
           // todo: [CRITICAL]: think of the rounding, it should be up, probably?
           maticController.text = (gauVal * gauPriceInMatic).toStringAsFixed(2);
         },
@@ -113,7 +108,6 @@ class SwapGauFragment extends HookConsumerWidget {
         label: swapToken.type.ticker,
         controller: maticController,
         keyboardType: const TextInputType.numberWithOptions(
-          signed: false,
           decimal: true,
         ),
         currency: true,
@@ -122,9 +116,6 @@ class SwapGauFragment extends HookConsumerWidget {
           final maticVal = double.tryParse(str);
           if (maticVal == null) {
             gauController.clear();
-            return;
-          }
-          if (gauPriceInMatic == null) {
             return;
           }
           // todo: [CRITICAL]: think of the rounding, it should be up, probably?

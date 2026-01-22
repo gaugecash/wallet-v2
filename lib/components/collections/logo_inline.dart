@@ -57,7 +57,7 @@ class LogoInlineComponent extends StatelessWidget {
 }
 
 class _Logo extends StatelessWidget {
-  const _Logo({super.key});
+  const _Logo();
 
   // String get versionLabel {
   //   return 'polygon mainnet';
@@ -82,7 +82,6 @@ class _Logo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Hero(
       tag: 'logo',
-      transitionOnUserGestures: false,
       child: Row(
         children: [
           Image.asset(

@@ -68,7 +68,7 @@ class AtmMachine {
 
       while (true) {
         try {
-          final res = await client.web3.getTransactionByHash(approveTx);
+          await client.web3.getTransactionByHash(approveTx);
           // print('approved: ${res.blockNumber}');
           break;
         } catch (_) {
@@ -225,8 +225,7 @@ class AtmMachine {
 
       while (true) {
         try {
-          final res = await client.web3.getTransactionByHash(approveTx);
-          logger.i('approved: ${res.blockNumber}');
+          await client.web3.getTransactionByHash(approveTx);
           break;
         } catch (_) {
           logger.i('not approved yet');
@@ -306,7 +305,7 @@ class AtmMachine {
         function: usd.smartContract.self.function('approve'),
         parameters: [
           EthereumAddress.fromHex(_atmAddress),
-          wei
+          wei,
           // BigInt.from(amount * pow(10, 18)),
         ],
         from: await wallet.getAddress(),
@@ -324,8 +323,7 @@ class AtmMachine {
 
       while (true) {
         try {
-          final res = await client.web3.getTransactionByHash(approveTx);
-          logger.i('approved: ${res.blockNumber}');
+          await client.web3.getTransactionByHash(approveTx);
           break;
         } catch (_) {
           logger.i('not approved yet');
