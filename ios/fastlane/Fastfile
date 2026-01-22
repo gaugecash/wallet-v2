@@ -27,9 +27,11 @@ platform :ios do
   lane :build_signed do
     # 1. Get certificates and profiles using Match
     # (setup_ci and api_key are already handled by before_all)
+    # TEMPORARY: Force regeneration for iCloud capability update
     match(
       type: "appstore",
-      readonly: true, # Strictly readonly in CI
+      readonly: false,
+      force_for_new_devices: true,
       app_identifier: "com.gaugecash.app",
       git_url: ENV["MATCH_GIT_URL"] || "git@github.com:gaugecash/ios-certificates.git"
     )
