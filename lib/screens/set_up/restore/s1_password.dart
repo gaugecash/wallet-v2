@@ -32,12 +32,14 @@ class SetUpRestore1PasswordStep extends SetUpStep {
           final mnemonic = wallet.mnemonic;
 
           final walletService = ref.read(walletProvider);
-          // final setupService = ref.read(setUpCreateProvider);
 
-          // final backup = await WalletBackup.generate(mnemonic);
+          // Re-encrypt backup to new secure format (4-part with unique salt)
+          // This migrates old 2-part backups to new format on restore
+          final backup = await WalletBackup.generate(mnemonic);
+          final encryptedFile = await backup.encrypt(provider.password!);
 
           await walletService.saveMnemonic(mnemonic);
-          await walletService.saveBackupWallet(provider.backupFile!);
+          await walletService.saveBackupWallet(encryptedFile);
 
           return true;
         } catch (e) {
@@ -73,9 +75,11 @@ class SetUpRestore1PasswordStep extends SetUpStep {
   Widget buildContent(BuildContext context, WidgetRef ref) {
     final password = useTextEditingController();
 
-    if (!password.hasListeners) {
-      password.addListener(() => listener(password, ref));
-    }
+    useEffect(() {
+      void localListener() => listener(password, ref);
+      password.addListener(localListener);
+      return () => password.removeListener(localListener);
+    }, [password],);
 
     return Column(
       children: [

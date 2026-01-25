@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+ (API 31+) Data Extraction Rules for GAUwallet
+
+  Similar to backup_rules.xml but required specifically for Android 12+
+  Handles both cloud backups (Google Drive) and device-to-device transfers
+
+  CRITICAL SECURITY NOTE:
+  - flutter_secure_storage is EXCLUDED because Android Keystore keys are hardware-bound
+  - Keystore keys cannot be transferred to another device
+  - wallet_backup.txt is INCLUDED for automatic cloud sync
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Include app files for Google Drive backup -->
+        <include domain="file" path="." />
+
+        <!-- CRITICAL: Exclude flutter_secure_storage -->
+        <exclude domain="sharedpref" path="FlutterSecureStorage" />
+        <exclude domain="sharedpref" path="FlutterSecureStorageTEMP" />
+
+        <!-- Exclude unnecessary data -->
+        <exclude domain="database" path="." />
+        <exclude domain="external" path="." />
+    </cloud-backup>
+
+    <device-transfer>
+        <!-- Same rules for device-to-device transfer -->
+        <include domain="file" path="." />
+
+        <exclude domain="sharedpref" path="FlutterSecureStorage" />
+        <exclude domain="sharedpref" path="FlutterSecureStorageTEMP" />
+        <exclude domain="database" path="." />
+        <exclude domain="external" path="." />
+    </device-transfer>
+</data-extraction-rules>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android Auto Backup configuration for GAUwallet
+
+  Auto Backup automatically backs up app data to Google Drive when:
+  - User has enabled backup in Android settings
+  - Device is idle, charging, and connected to Wi-Fi
+  - Less than 24 hours have passed since last backup
+
+  Estimated adoption: 60-70% of Android users have backup enabled
+
+  CRITICAL SECURITY NOTE:
+  - flutter_secure_storage is EXCLUDED because Android Keystore keys DO NOT transfer between devices
+  - If Keystore data was backed up, decryption would fail on restore (keys are hardware-bound)
+  - Our wallet_backup.txt file is INCLUDED for automatic cloud backup
+-->
+<full-backup-content>
+    <!-- Include app files directory for automatic backup -->
+    <include domain="file" path="." />
+
+    <!-- CRITICAL: Exclude flutter_secure_storage -->
+    <!-- Keystore-encrypted data cannot be decrypted after device transfer -->
+    <exclude domain="sharedpref" path="FlutterSecureStorage" />
+
+    <!-- Exclude other unnecessary data -->
+    <exclude domain="sharedpref" path="FlutterSecureStorageTEMP" />
+    <exclude domain="database" path="." />
+    <exclude domain="external" path="." />
+</full-backup-content>
