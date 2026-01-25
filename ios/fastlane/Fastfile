@@ -78,7 +78,8 @@ platform :ios do
       skip_submission: false,
       distribute_external: true,
       groups: ["Internal Testing"],
-      notify_external_testers: true
+      notify_external_testers: true,
+      changelog: "Phase 1 Security: Auto-backup to iCloud with unique salt encryption"
     )
 
     UI.success("Successfully uploaded to TestFlight!")
