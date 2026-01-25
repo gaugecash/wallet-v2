@@ -76,6 +76,7 @@
 		<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<true/>
+	<true/>
 	<key>NSUbiquitousContainers</key>
 	<dict>
 		<key>iCloud.$(CFBundleIdentifier)</key>
