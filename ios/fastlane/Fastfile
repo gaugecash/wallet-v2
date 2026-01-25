@@ -71,15 +71,12 @@ platform :ios do
     # Build and sign
     build_signed
 
-    # Upload to TestFlight
+    # Upload to TestFlight for internal testing
     # (API key is already configured in before_all)
+    # Internal testers in App Store Connect get automatic access - no groups needed
     upload_to_testflight(
       skip_waiting_for_build_processing: false,
-      skip_submission: false,
-      distribute_external: true,
-      groups: ["Internal Testing"],
-      notify_external_testers: true,
-      changelog: "Phase 1 Security: Auto-backup to iCloud with unique salt encryption"
+      skip_submission: false
     )
 
     UI.success("Successfully uploaded to TestFlight!")
