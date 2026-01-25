@@ -12,7 +12,6 @@ import 'package:wallet/screens/set_up/components/page_indicator.dart';
 import 'package:wallet/screens/set_up/components/step.dart';
 import 'package:wallet/screens/set_up/create/model.dart';
 import 'package:wallet/screens/set_up/create/s0_password.dart';
-import 'package:wallet/screens/set_up/create/s1_file.dart';
 import 'package:wallet/screens/set_up/create/s2_security.dart';
 import 'package:wallet/screens/set_up/restore/model.dart';
 import 'package:wallet/screens/set_up/restore/s0_file.dart';
@@ -48,7 +47,7 @@ class _SetUpWrapperScreen extends HookConsumerWidget {
     if (action == SetUpAction.create) {
       return [
         const SetUpCreate0PasswordStep(),
-        const SetUpCreate1FileStep(),
+        // SetUpCreate1FileStep removed - Phase 1 uses silent auto-backup instead
         const SetUpCreate2SecurityStep(),
       ];
     }
@@ -107,7 +106,7 @@ class _SetUpWrapperScreen extends HookConsumerWidget {
           Hero(
             tag: action == SetUpAction.create ? 'primary' : 'secondary',
             child: GPrimaryButton(
-              label: provider.currentPage != 2 ? 'Continue ' : 'Finish',
+              label: provider.currentPage != 1 ? 'Continue ' : 'Finish',
               onPressed: provider.canContinue
                   ? () async {
                       final page = steps[provider.currentPage];
@@ -118,7 +117,7 @@ class _SetUpWrapperScreen extends HookConsumerWidget {
                       FocusManager.instance.primaryFocus?.unfocus();
 
                       if (result) {
-                        if (provider.currentPage == 2) {
+                        if (provider.currentPage == 1) {
                           context.router.pushNamed('/');
                           context.router
                               .removeWhere((route) => route.path != '/');

@@ -93,13 +93,14 @@ void main() {
     });
 
     test('invalid format (wrong number of parts) throws error', () async {
-      const invalidFormat = 'part1.part2';  // Only 2 parts instead of 4
+      // 3 parts is invalid (neither legacy 2-part nor new 4-part)
+      const invalidFormat = 'part1.part2.part3';
 
       expect(
         () => computeDecrypt(password, invalidFormat),
         throwsA(predicate((e) =>
           e is ArgumentError &&
-          e.message.toString().contains('Expected 4 parts'),
+          e.message.toString().contains('Expected 2 parts (legacy) or 4 parts (current)'),
         ),),
         reason: 'Invalid format should throw ArgumentError',
       );

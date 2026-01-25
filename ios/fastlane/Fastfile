@@ -72,9 +72,8 @@ platform :ios do
     # Upload to TestFlight
     # (API key is already configured in before_all)
     upload_to_testflight(
-      skip_waiting_for_build_processing: true,
-      skip_submission: true,
-      notify_external_testers: false
+      skip_waiting_for_build_processing: false,
+      skip_submission: false
     )
 
     UI.success("Successfully uploaded to TestFlight!")

@@ -8,7 +8,7 @@ class SetUpCreate2SecurityStep extends SetUpStep {
   const SetUpCreate2SecurityStep({super.key});
 
   @override
-  int get page => 2;
+  int get page => 1;
 
   @override
   // name is taken in the SetUpStep via ref

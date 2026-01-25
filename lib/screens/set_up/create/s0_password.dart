@@ -32,6 +32,9 @@ class SetUpCreate0PasswordStep extends SetUpStep {
         await walletService.saveMnemonic(mnemonic);
         await walletService.saveBackupWallet(encryptedFile);
 
+        // Phase 1: Silent auto-save to app files for cloud backup
+        await backup.autoSave(setupService.password!);
+
         return true;
       };
 
