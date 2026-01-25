@@ -1,7 +1,7 @@
 name: wallet
 description: GAU wallet
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
-version: 1.0.8+143
+version: 1.0.8+144
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -122,7 +122,7 @@ flutter:
     - assets/icons/
     #    - .git/HEAD               # This file points out the current branch of the project.
     #    - .git/ORIG_HEAD          # This file points to the commit id at origin (last commit id of the remote repository).
-    - .git/refs/heads/main # This directory includes files for each branch which points to the last commit id (local repo).
+    #    - .git/refs/heads/main # This directory includes files for each branch which points to the last commit id (local repo).
 
   fonts:
     - family: Chivo
