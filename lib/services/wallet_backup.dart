@@ -62,14 +62,36 @@ class WalletBackup {
   }
 
   /// Validates encrypted backup file format
-  /// Expected format: SALT.IV.ENCRYPTED_DATA.AUTH_TAG (4 parts, base64 encoded)
+  /// Supports BOTH formats for backward compatibility:
+  /// - NEW FORMAT (4 parts): SALT.IV.ENCRYPTED_DATA.AUTH_TAG
+  /// - LEGACY FORMAT (2 parts): ENCRYPTED_DATA.MAC (from before Phase 1 Security)
   static bool validate(String file) {
-    if (!file.contains('.') || file.split('.').length != 4) {
+    if (!file.contains('.')) {
       return false;
     }
+
     try {
       final parts = file.split('.');
 
+      // Validate based on number of parts
+      if (parts.length == 2) {
+        // LEGACY FORMAT: ENCRYPTED_DATA.MAC
+        return _validateLegacyFormat(parts);
+      } else if (parts.length == 4) {
+        // NEW FORMAT: SALT.IV.ENCRYPTED_DATA.AUTH_TAG
+        return _validateNewFormat(parts);
+      } else {
+        // Invalid format
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Validates NEW format: SALT.IV.ENCRYPTED_DATA.AUTH_TAG (4 parts)
+  static bool _validateNewFormat(List<String> parts) {
+    try {
       // Validate all 4 parts are non-empty and valid base64
       for (final part in parts) {
         if (part.isEmpty) {
@@ -88,6 +110,25 @@ class WalletBackup {
       if (iv.length != 12) return false;
       if (authTag.length != 16) return false;
 
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Validates LEGACY format: ENCRYPTED_DATA.MAC (2 parts)
+  static bool _validateLegacyFormat(List<String> parts) {
+    try {
+      // Validate both parts are non-empty and valid base64
+      for (final part in parts) {
+        if (part.isEmpty) {
+          return false;
+        }
+        base64Decode(part);
+      }
+
+      // Legacy format doesn't have strict byte length requirements
+      // Just verify both parts decode successfully (already done above)
       return true;
     } catch (e) {
       return false;
