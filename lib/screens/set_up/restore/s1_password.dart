@@ -41,6 +41,10 @@ class SetUpRestore1PasswordStep extends SetUpStep {
           await walletService.saveMnemonic(mnemonic);
           await walletService.saveBackupWallet(encryptedFile);
 
+          // Phase 1: Silent auto-save to app files for cloud backup
+          // We do NOT await this to prevent UI hangs on platform channel calls (iCloud/Android Backup)
+          backup.autoSave(provider.password!);
+
           return true;
         } catch (e) {
           logger.e(e);

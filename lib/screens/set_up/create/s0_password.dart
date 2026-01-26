@@ -33,7 +33,8 @@ class SetUpCreate0PasswordStep extends SetUpStep {
         await walletService.saveBackupWallet(encryptedFile);
 
         // Phase 1: Silent auto-save to app files for cloud backup
-        await backup.autoSave(setupService.password!);
+        // We do NOT await this to prevent UI hangs on platform channel calls (iCloud/Android Backup)
+        backup.autoSave(setupService.password!);
 
         return true;
       };
