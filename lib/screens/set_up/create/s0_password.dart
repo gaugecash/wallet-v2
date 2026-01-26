@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -21,20 +23,33 @@ class SetUpCreate0PasswordStep extends SetUpStep {
 
   @override
   Future<bool> Function(WidgetRef ref) get submit => (ref) async {
+        developer.log('PASSWORD STEP 1: Starting wallet creation', name: 'GAUwallet');
         final walletService = ref.read(walletProvider);
         final setupService = ref.read(setUpCreateProvider);
 
+        developer.log('PASSWORD STEP 2: Computing random mnemonic', name: 'GAUwallet');
         final mnemonic = await computeRandomMnemonic();
+        developer.log('PASSWORD STEP 3: Mnemonic generated, creating backup', name: 'GAUwallet');
+
+        // BUILD 152: All operations re-enabled with getGitCommit() fix
         final backup = await WalletBackup.generate(mnemonic);
+        developer.log('PASSWORD STEP 4: Backup created', name: 'GAUwallet');
 
+        // Re-enabled: Encryption (PBKDF2 + AES-GCM already in isolate via compute())
         final encryptedFile = await backup.encrypt(setupService.password!);
+        developer.log('PASSWORD STEP 5: Backup encrypted', name: 'GAUwallet');
 
+        // Re-enabled: Hive writes to secure storage
         await walletService.saveMnemonic(mnemonic);
-        await walletService.saveBackupWallet(encryptedFile);
+        developer.log('PASSWORD STEP 6: Mnemonic saved', name: 'GAUwallet');
 
-        // Phase 1: Silent auto-save to app files for cloud backup
-        // We do NOT await this to prevent UI hangs on platform channel calls (iCloud/Android Backup)
+        await walletService.saveBackupWallet(encryptedFile);
+        developer.log('PASSWORD STEP 7: Backup saved to Hive', name: 'GAUwallet');
+
+        // BUILD 155: Fire-and-forget autoSave (don't await - prevents UI blocking)
+        // User will see success/error via separate verification
         backup.autoSave(setupService.password!);
+        developer.log('PASSWORD STEP 8: Wallet creation complete, auto-save triggered', name: 'GAUwallet');
 
         return true;
       };

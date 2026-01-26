@@ -1,7 +1,10 @@
-import 'package:flutter/services.dart';
+// Git commit hash - generated at build time
+// This is a constant to avoid runtime asset loading which freezes in Release mode
+// To update: Run `git rev-parse --short HEAD` and paste result below
+const String _buildCommit = '4b9a192';
 
 Future<String> getGitCommit() async {
-  final commit = await rootBundle.loadString('.git/refs/heads/main');
-
-  return commit.trim().substring(0, 7);
+  // Return build-time constant instead of reading from assets
+  // (Reading .git files from rootBundle freezes in Release mode)
+  return _buildCommit;
 }

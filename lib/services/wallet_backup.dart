@@ -25,10 +25,11 @@ class WalletBackup {
   static Future<WalletBackup> generate(String mnemonic) async {
     final createdAt = DateTime.now();
 
+    // BUILD 152 - Re-enabled with getGitCommit() fix (now uses build-time constant)
     final packageInfo = await PackageInfo.fromPlatform();
-
     final appVersion = packageInfo.version;
 
+    // Fixed: Now uses build-time constant instead of reading from assets
     final appBuildCommit = await getGitCommit();
 
     return WalletBackup(

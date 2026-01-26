@@ -25,6 +25,7 @@ import 'package:wallet/providers/wallet.dart';
 import 'package:wallet/repository/coins/erc20.dart';
 import 'package:wallet/repository/simple_swap_exchange.dart';
 import 'package:wallet/services/share_file.dart';
+import 'package:wallet/services/wallet_backup.dart';
 import 'package:wallet/styling.dart';
 import 'package:wallet/utils/git_commit.dart';
 
@@ -203,6 +204,20 @@ class SettingsScreen extends HookConsumerWidget {
               copyLogsToClipboard();
               showSuccessDialog(context);
             },
+          ),
+        ),
+        SliverToBoxAdapter(child: SizedBox(height: GPaddings.small(context))),
+        GPaddingsLayoutHorizontal.sliver(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12.0),
+            child: Text(
+              'This creates an encrypted file you can save anywhere. Your password protects it.',
+              style: TextStyle(
+                color: GColors.white.withOpacity(0.7),
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
         SliverToBoxAdapter(child: SizedBox(height: GPaddings.small(context))),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -21,34 +22,46 @@ class SplashScreen extends HookConsumerWidget {
 
   Future<List<int>> _getStorageKey() async {
     late List<int> key;
-    const secureStorage = FlutterSecureStorage();
-    print('reading secure key');
-    final containsEncryptionKey = await secureStorage.read(key: 'hive');
-    print('checking secure key');
-    if (containsEncryptionKey == null) {
-      print('no secure key, generating');
-      key = Hive.generateSecureKey();
-      await secureStorage.write(key: 'hive', value: base64Encode(key));
-    } else {
-      print('there is a key, reading');
-      key = base64Decode(containsEncryptionKey);
-    }
+    // DISABLED FOR TESTING - FlutterSecureStorage completely bypassed
+    // developer.log('KEYCHAIN STEP 1: Creating FlutterSecureStorage', name: 'GAUwallet');
+    // const secureStorage = FlutterSecureStorage();
 
-    print('got a key');
+    // developer.log('KEYCHAIN STEP 2: Reading from secure storage (FREEZE POINT?)', name: 'GAUwallet');
+    // final containsEncryptionKey = await secureStorage.read(key: 'hive');
+    // developer.log('KEYCHAIN STEP 3: Secure storage read completed', name: 'GAUwallet');
+
+    // DUMMY: Always generate a new key (no keychain access)
+    // if (containsEncryptionKey == null) {
+      // developer.log('KEYCHAIN STEP 4: No key found, generating new', name: 'GAUwallet');
+      key = Hive.generateSecureKey();
+      // developer.log('KEYCHAIN STEP 5: Writing new key to secure storage (FREEZE POINT?)', name: 'GAUwallet');
+      // await secureStorage.write(key: 'hive', value: base64Encode(key));
+      // developer.log('KEYCHAIN STEP 6: Key write completed', name: 'GAUwallet');
+    // } else {
+    //   developer.log('KEYCHAIN STEP 4: Key exists, decoding', name: 'GAUwallet');
+    //   key = base64Decode(containsEncryptionKey);
+    // }
+
+    // developer.log('KEYCHAIN STEP 7: Returning key', name: 'GAUwallet');
     return key;
   }
 
   Future<void> _initStorage() async {
     if (Hive.isBoxOpen('safe')) {
+      developer.log('STORAGE: Box already open, returning', name: 'GAUwallet');
       return;
     }
 
+    developer.log('STORAGE STEP 1: Starting Hive initialization', name: 'GAUwallet');
     await Hive.initFlutter();
+    developer.log('STORAGE STEP 2: Hive initialized, getting storage key', name: 'GAUwallet');
 
     final key = await _getStorageKey();
+    developer.log('STORAGE STEP 3: Got storage key, opening encrypted box', name: 'GAUwallet');
 
     // mnemonic, backup, auth
     await Hive.openBox<String>(safeBox, encryptionCipher: HiveAesCipher(key));
+    developer.log('STORAGE STEP 4: Encrypted box opened successfully', name: 'GAUwallet');
   }
 
   Future<void> _init(BuildContext context, WidgetRef ref) async {
