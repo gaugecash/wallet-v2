@@ -11,7 +11,6 @@ import 'package:wallet/screens/set_up/create/model.dart';
 import 'package:wallet/services/bip.dart';
 import 'package:wallet/services/wallet_backup.dart';
 
-// todo fix keyboard appearing and breaking the canContinue workflow
 class SetUpCreate0PasswordStep extends SetUpStep {
   SetUpCreate0PasswordStep({super.key});
 
@@ -24,11 +23,23 @@ class SetUpCreate0PasswordStep extends SetUpStep {
   // Store context for use in submit function (needed for SnackBar feedback)
   BuildContext? _currentContext;
 
+  // Track which step of password creation we're on
+  ValueNotifier<int>? _stepNotifier;
+
   @override
   Future<bool> Function(WidgetRef ref) get submit => (ref) async {
+        final currentStep = _stepNotifier?.value ?? 1;
+
+        // Step 1: Advance to step 2 instead of submitting
+        if (currentStep == 1) {
+          _stepNotifier?.value = 2;
+          setCanSubmit(ref, false); // Disable button temporarily
+          return false; // Don't navigate forward yet
+        }
+
+        // Step 2: Create the wallet
         final setupService = ref.read(setUpCreateProvider);
 
-        // Create the wallet
         developer.log('PASSWORD STEP 1: Starting wallet creation', name: 'GAUwallet');
         final walletService = ref.read(walletProvider);
 
@@ -69,11 +80,19 @@ class SetUpCreate0PasswordStep extends SetUpStep {
       return;
     }
 
+    final currentStep = _stepNotifier?.value ?? 1;
     final p1 = password1.text;
     final p2 = password2.text;
 
-    // Validate both passwords match
-    final validation = validate(p1, p2);
+    bool validation;
+    if (currentStep == 1) {
+      // Step 1: Just check password field is not empty
+      validation = p1.isNotEmpty;
+    } else {
+      // Step 2: Check both passwords match
+      validation = validate(p1, p2);
+    }
+
     setCanSubmit(ref, validation);
     provider.password = p1;
   }
@@ -85,6 +104,9 @@ class SetUpCreate0PasswordStep extends SetUpStep {
 
     final password = useTextEditingController();
     final passwordRepeat = useTextEditingController();
+    final step = useState(1);
+    _stepNotifier = step; // Store reference for submit function
+
     final passwordsMatch = useState<bool?>(null);
 
     useEffect(() {
@@ -97,32 +119,42 @@ class SetUpCreate0PasswordStep extends SetUpStep {
       };
     }, [password, passwordRepeat],);
 
-    // Check password match for visual feedback
+    // Check password match for visual feedback (Step 2 only)
     useEffect(() {
-      if (passwordRepeat.text.isNotEmpty) {
+      if (step.value == 2 && passwordRepeat.text.isNotEmpty) {
         passwordsMatch.value = password.text == passwordRepeat.text;
       } else {
         passwordsMatch.value = null;
       }
       return null;
-    }, [password.text, passwordRepeat.text]);
+    }, [password.text, passwordRepeat.text, step.value],);
 
-    return Column(
-      children: [
-        GPrimaryInput(
-          controller: password,
-          label: 'Password',
-          obscureText: true,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'We recommend at least 8 characters for better security',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade600,
+    // STEP 1: Create Password
+    if (step.value == 1) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GPrimaryInput(
+            controller: password,
+            label: 'Password',
+            obscureText: true,
           ),
-        ),
-        const SizedBox(height: 18),
+          const SizedBox(height: 8),
+          Text(
+            'We recommend at least 8 characters for better security',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade600,
+            ),
+          ),
+        ],
+      );
+    }
+
+    // STEP 2: Confirm Password
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         Stack(
           alignment: Alignment.centerRight,
           children: [
