@@ -10,7 +10,7 @@ import 'package:wallet/services/wallet_backup.dart';
 
 // todo fix keyboard appearing and breaking the canContinue workflow
 class SetUpRestore1PasswordStep extends SetUpStep {
-  const SetUpRestore1PasswordStep({super.key});
+  SetUpRestore1PasswordStep({super.key});
 
   @override
   int get page => 1;

@@ -13,7 +13,7 @@ import 'package:wallet/services/wallet_backup.dart';
 
 // todo fix keyboard appearing and breaking the canContinue workflow
 class SetUpCreate0PasswordStep extends SetUpStep {
-  const SetUpCreate0PasswordStep({super.key});
+  SetUpCreate0PasswordStep({super.key});
 
   @override
   int get page => 0;
@@ -28,14 +28,7 @@ class SetUpCreate0PasswordStep extends SetUpStep {
   Future<bool> Function(WidgetRef ref) get submit => (ref) async {
         final setupService = ref.read(setUpCreateProvider);
 
-        // Check if we're on step 1 - if so, advance to step 2
-        if (setupService.passwordStep == 1) {
-          setupService.passwordStep = 2;
-          setupService.canContinue = false; // Disable button until passwords match
-          return false; // Don't proceed to next page yet
-        }
-
-        // Step 2: Actually create the wallet
+        // Create the wallet
         developer.log('PASSWORD STEP 1: Starting wallet creation', name: 'GAUwallet');
         final walletService = ref.read(walletProvider);
 
@@ -61,12 +54,8 @@ class SetUpCreate0PasswordStep extends SetUpStep {
         return true;
       };
 
-  bool validateStep1(String p1) {
-    return p1.isNotEmpty;
-  }
-
-  bool validateStep2(String p1, String p2) {
-    return p2.isNotEmpty && p1 == p2;
+  bool validate(String p1, String p2) {
+    return p1.isNotEmpty && p2.isNotEmpty && p1 == p2;
   }
 
   void listener(
@@ -83,16 +72,10 @@ class SetUpCreate0PasswordStep extends SetUpStep {
     final p1 = password1.text;
     final p2 = password2.text;
 
-    if (provider.passwordStep == 1) {
-      // Step 1: Validate first password input
-      final validation = validateStep1(p1);
-      setCanSubmit(ref, validation);
-    } else {
-      // Step 2: Validate passwords match
-      final validation = validateStep2(p1, p2);
-      setCanSubmit(ref, validation);
-      provider.password = p1;
-    }
+    // Validate both passwords match
+    final validation = validate(p1, p2);
+    setCanSubmit(ref, validation);
+    provider.password = p1;
   }
 
   @override
@@ -102,7 +85,6 @@ class SetUpCreate0PasswordStep extends SetUpStep {
 
     final password = useTextEditingController();
     final passwordRepeat = useTextEditingController();
-    final provider = ref.watch(setUpCreateProvider);
     final passwordsMatch = useState<bool?>(null);
 
     useEffect(() {
@@ -115,65 +97,57 @@ class SetUpCreate0PasswordStep extends SetUpStep {
       };
     }, [password, passwordRepeat],);
 
-    // Check password match for visual feedback in step 2
+    // Check password match for visual feedback
     useEffect(() {
-      if (provider.passwordStep == 2 && passwordRepeat.text.isNotEmpty) {
+      if (passwordRepeat.text.isNotEmpty) {
         passwordsMatch.value = password.text == passwordRepeat.text;
       } else {
         passwordsMatch.value = null;
       }
       return null;
-    }, [passwordRepeat.text, provider.passwordStep]);
+    }, [password.text, passwordRepeat.text]);
 
-    if (provider.passwordStep == 1) {
-      // Step 1: Create password
-      return Column(
-        children: [
-          GPrimaryInput(
-            controller: password,
-            label: 'Password',
-            obscureText: true,
+    return Column(
+      children: [
+        GPrimaryInput(
+          controller: password,
+          label: 'Password',
+          obscureText: true,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'We recommend at least 8 characters for better security',
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey.shade600,
           ),
-          const SizedBox(height: 8),
-          Text(
-            'We recommend at least 8 characters for better security',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade600,
+        ),
+        const SizedBox(height: 18),
+        Stack(
+          alignment: Alignment.centerRight,
+          children: [
+            GPrimaryInput(
+              controller: passwordRepeat,
+              label: 'Confirm password',
+              obscureText: true,
             ),
-          ),
-          const SizedBox(height: 18 + 13),
-          const WarningAlertComponent(
-            text:
-                'The wallet backup file will be encrypted with this password. You will need it only when restoring the wallet.',
-          ),
-        ],
-      );
-    } else {
-      // Step 2: Confirm password
-      return Column(
-        children: [
-          Stack(
-            alignment: Alignment.centerRight,
-            children: [
-              GPrimaryInput(
-                controller: passwordRepeat,
-                label: 'Confirm password',
-                obscureText: true,
-              ),
-              if (passwordsMatch.value != null)
-                Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
-                  child: Icon(
-                    passwordsMatch.value! ? Icons.check_circle : Icons.cancel,
-                    color: passwordsMatch.value! ? Colors.green : Colors.red,
-                    size: 24,
-                  ),
+            if (passwordsMatch.value != null)
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Icon(
+                  passwordsMatch.value! ? Icons.check_circle : Icons.cancel,
+                  color: passwordsMatch.value! ? Colors.green : Colors.red,
+                  size: 24,
                 ),
-            ],
-          ),
-        ],
-      );
-    }
+              ),
+          ],
+        ),
+        const SizedBox(height: 13),
+        const WarningAlertComponent(
+          text:
+              'The wallet backup file will be encrypted with this password. You will need it only when restoring the wallet.',
+        ),
+      ],
+    );
   }
 }

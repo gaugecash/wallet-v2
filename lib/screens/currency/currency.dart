@@ -9,6 +9,7 @@ import 'package:wallet/components/slivers/spacing.dart';
 import 'package:wallet/conf.dart';
 import 'package:wallet/layouts/app_layout_sliver.dart';
 import 'package:wallet/model_components/balance_compact.dart';
+import 'package:wallet/model_components/wallet_action.dart';
 import 'package:wallet/models/currency.dart';
 import 'package:wallet/providers/wallet.dart';
 import 'package:wallet/screens/currency/_receive.dart';
@@ -41,7 +42,8 @@ class CurrencyScreen extends HookConsumerWidget {
       (element) => element.type.ticker == ticker,
     );
 
-    final controller = useTabController(initialLength: 2);
+    // State to track which action is currently selected (0: Receive, 1: Send)
+    final selectedAction = useState(0);
 
     final wideScreen = MediaQuery.of(context).size.width > breakPointWidth;
 
@@ -63,20 +65,46 @@ class CurrencyScreen extends HookConsumerWidget {
         GPaddingsLayoutHorizontal.sliver(
           child: Row(
             children: [
-              TabBar(
-                controller: controller,
-                indicatorColor: Colors.transparent,
-                labelStyle: GTextStyles.h1,
-                isScrollable: true,
-                labelPadding: const EdgeInsets.symmetric(horizontal: 8),
-                unselectedLabelColor: GColors.white.withOpacity(0.4),
-                splashBorderRadius: BorderRadius.circular(12),
-                tabs: const [
-                  Text('Receive'),
-                  Text('Send'),
-                  // Text('History'),
-                ],
+              Expanded(
+                child: GWalletActionButton(
+                  label: 'Receive',
+                  icon: LucideIcons.download,
+                  onPressed: () {
+                    selectedAction.value = 0;
+                  },
+                ),
               ),
+              SizedBox(width: GPaddings.small(context)),
+              Expanded(
+                child: GWalletActionButton(
+                  label: 'Send',
+                  icon: LucideIcons.send,
+                  onPressed: () {
+                    selectedAction.value = 1;
+                  },
+                ),
+              ),
+              if (coin.type == CurrencyTicker.gau) ...[
+                SizedBox(width: GPaddings.small(context)),
+                Expanded(
+                  child: GWalletActionButton(
+                    label: 'Buy GAU',
+                    icon: LucideIcons.shoppingCart,
+                    onPressed: () {
+                      context.router.pushNamed('/invest');
+                    },
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+
+        SliverToBoxAdapter(child: SizedBox(height: GPaddings.small(context))),
+
+        GPaddingsLayoutHorizontal.sliver(
+          child: Row(
+            children: [
               const Spacer(),
               GTransparentButton(
                 child: Row(
@@ -108,17 +136,11 @@ class CurrencyScreen extends HookConsumerWidget {
         ),
 
         SliverFillRemaining(
-          // hasScrollBody: false,
-          child: TabBarView(
-            controller: controller,
-            children: [
-              const GPaddingsLayoutHorizontal(child: ReceiveCurrencyTab()),
-              GPaddingsLayoutHorizontal(
-                child: SendCurrencyTab(coin, maticBalance.data),
-              ),
-              // Container(color: Colors.red, height: double.infinity, width: double.infinity),
-              // Container(),
-            ],
+          hasScrollBody: false,
+          child: GPaddingsLayoutHorizontal(
+            child: selectedAction.value == 0
+                ? const ReceiveCurrencyTab()
+                : SendCurrencyTab(coin, maticBalance.data),
           ),
         ),
         // // const SizedBox(height: 12),

@@ -46,7 +46,7 @@ class _SetUpWrapperScreen extends HookConsumerWidget {
     logger.d('getting the steps');
     if (action == SetUpAction.create) {
       return [
-        const SetUpCreate0PasswordStep(),
+        SetUpCreate0PasswordStep(),
         // SetUpCreate1FileStep removed - Phase 1 uses silent auto-backup instead
         const SetUpCreate2SecurityStep(),
       ];
@@ -55,7 +55,7 @@ class _SetUpWrapperScreen extends HookConsumerWidget {
     if (action == SetUpAction.restore) {
       return [
         const SetUpRestore0FileStep(),
-        const SetUpRestore1PasswordStep(),
+        SetUpRestore1PasswordStep(),
         const SetUpCreate2SecurityStep(),
       ];
     }
