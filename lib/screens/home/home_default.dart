@@ -71,15 +71,32 @@ class HomePageDefaultFragment extends HookConsumerWidget {
         GPaddingsLayoutHorizontal.sliver(
           child: Row(
             children: [
-              // Expanded(
-              //   child: GWalletActionButton(
-              //     label: 'Calculator',
-              //     icon: LucideIcons.calculator,
-              //     onPressed: () {
-              //       context.router.pushNamed('/calculator');
-              //     },
-              //   ),
-              // ),
+              Expanded(
+                child: GWalletActionButton(
+                  label: 'Send',
+                  icon: LucideIcons.send,
+                  onPressed: () {
+                    context.router.pushNamed('/send');
+                  },
+                ),
+              ),
+              SizedBox(width: GPaddings.small(context)),
+              Expanded(
+                child: GWalletActionButton(
+                  label: 'Receive',
+                  icon: LucideIcons.download,
+                  onPressed: () {
+                    context.router.pushNamed('/receive');
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        SliverToBoxAdapter(child: SizedBox(height: GPaddings.small(context))),
+        GPaddingsLayoutHorizontal.sliver(
+          child: Row(
+            children: [
               Expanded(
                 child: GWalletActionButton(
                   label: 'Swap',
