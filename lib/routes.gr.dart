@@ -193,6 +193,44 @@ class NetworkErrorRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ReceiveScreen]
+class ReceiveRoute extends PageRouteInfo<void> {
+  const ReceiveRoute({List<PageRouteInfo>? children})
+      : super(
+          ReceiveRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'ReceiveRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ReceiveScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [SendScreen]
+class SendRoute extends PageRouteInfo<void> {
+  const SendRoute({List<PageRouteInfo>? children})
+      : super(
+          SendRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'SendRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const SendScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [SetUpCreateScreen]
 class SetUpCreateRoute extends PageRouteInfo<void> {
   const SetUpCreateRoute({List<PageRouteInfo>? children})

@@ -56,12 +56,12 @@ class Uniswap_quote2 extends _i1.GeneratedContract {
   }) async {
     final function = self.abi.functions[1];
     assert(checkSignature(function, 'c6a5026a'));
-    final params2 = [params];
+    final params = [params];
     return write(
       credentials,
       transaction,
       function,
-      params2,
+      params,
     );
   }
 
@@ -98,12 +98,12 @@ class Uniswap_quote2 extends _i1.GeneratedContract {
   }) async {
     final function = self.abi.functions[3];
     assert(checkSignature(function, 'bd21704a'));
-    final params2 = [params];
+    final params = [params];
     return write(
       credentials,
       transaction,
       function,
-      params2,
+      params,
     );
   }
 }

@@ -11,6 +11,8 @@ import 'package:wallet/screens/home/invest.dart';
 import 'package:wallet/screens/home/settings.dart';
 import 'package:wallet/screens/home/swap.dart';
 import 'package:wallet/screens/intro/intro.dart';
+import 'package:wallet/screens/receive.dart';
+import 'package:wallet/screens/send.dart';
 import 'package:wallet/screens/set_up/_wrapper.dart';
 import 'package:wallet/screens/splash.dart';
 
@@ -115,6 +117,16 @@ class AppRouter extends RootStackRouter {
     CustomRoute(
       page: SwapRoute.page,
       path: '/swap',
+      transitionsBuilder: secondaryTransition,
+    ),
+    CustomRoute(
+      page: SendRoute.page,
+      path: '/send',
+      transitionsBuilder: secondaryTransition,
+    ),
+    CustomRoute(
+      page: ReceiveRoute.page,
+      path: '/receive',
       transitionsBuilder: secondaryTransition,
     ),
     CustomRoute(
