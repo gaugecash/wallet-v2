@@ -101,6 +101,19 @@ class ReceiveCurrencyTab extends HookConsumerWidget {
           ),
         ),
         SliverToBoxAdapter(child: SizedBox(height: GPaddings.small(context))),
+        SliverToBoxAdapter(
+          child: Center(
+            child: Text(
+              'This address receives GAU, USDT, and POL',
+              style: TextStyle(
+                fontSize: 14,
+                color: GColors.white.withOpacity(0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(child: SizedBox(height: GPaddings.small(context))),
       ],
     );
   }
