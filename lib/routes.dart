@@ -13,6 +13,7 @@ import 'package:wallet/screens/home/swap.dart';
 import 'package:wallet/screens/intro/intro.dart';
 import 'package:wallet/screens/receive.dart';
 import 'package:wallet/screens/send.dart';
+import 'package:wallet/screens/send_token_select.dart';
 import 'package:wallet/screens/set_up/_wrapper.dart';
 import 'package:wallet/screens/splash.dart';
 
@@ -122,6 +123,11 @@ class AppRouter extends RootStackRouter {
     CustomRoute(
       page: SendRoute.page,
       path: '/send',
+      transitionsBuilder: secondaryTransition,
+    ),
+    CustomRoute(
+      page: SendTokenSelectRoute.page,
+      path: '/send-token-select',
       transitionsBuilder: secondaryTransition,
     ),
     CustomRoute(
