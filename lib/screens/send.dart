@@ -2,8 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:wallet/components/slivers/spacing.dart';
 import 'package:wallet/layouts/app_layout_sliver.dart';
 import 'package:wallet/models/currency.dart';
 import 'package:wallet/providers/wallet.dart';
@@ -20,15 +18,23 @@ class SendScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final wallet = ref.read(walletProvider);
 
-    // Pre-select currency if ticker is provided
-    final Currency? initialCurrency = preselectedTicker != null
-        ? wallet.currencies?.firstWhere(
+    // If no ticker provided, redirect to token selection screen
+    useEffect(() {
+      if (preselectedTicker == null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.router.replaceNamed('/send-token-select');
+        });
+      }
+      return null;
+    }, []);
+
+    // Get selected currency from ticker
+    final selectedCurrency = preselectedTicker != null
+        ? wallet.currencies!.firstWhere(
             (c) => c.type.ticker.toLowerCase() == preselectedTicker!.toLowerCase(),
             orElse: () => wallet.currencies!.first,
           )
         : null;
-
-    final selectedCurrency = useState<Currency?>(initialCurrency);
 
     // Get MATIC balance for gasless fee calculation
     final matic = wallet.currencies!.firstWhere(
@@ -37,10 +43,21 @@ class SendScreen extends HookConsumerWidget {
     final maticBalance =
         useStream(matic.balance.stream, initialData: matic.balance.lastValue);
 
-    // Filter currencies for the dropdown (exclude exchange-only and invest-only)
-    final sendableCurrencies = wallet.currencies!
-        .where((c) => !c.investOnly && !c.exchangeOnly)
-        .toList();
+    // If no currency selected, show loading while redirecting
+    if (selectedCurrency == null) {
+      return AppLayoutSliver(
+        showBackButton: true,
+        children: [
+          SliverFillRemaining(
+            child: Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
 
     return AppLayoutSliver(
       showBackButton: true,
@@ -51,7 +68,7 @@ class SendScreen extends HookConsumerWidget {
               horizontal: GPaddings.layoutHorizontalPadding(),
             ),
             child: Text(
-              'Send',
+              'Send ${selectedCurrency.type.ticker.toUpperCase()}',
               style: GTextStyles.h1,
             ),
           ),
@@ -59,142 +76,18 @@ class SendScreen extends HookConsumerWidget {
         SliverToBoxAdapter(
           child: SizedBox(height: GPaddings.medium(context)),
         ),
-        SliverToBoxAdapter(
+        SliverFillRemaining(
+          hasScrollBody: false,
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: GPaddings.layoutHorizontalPadding(),
             ),
-            child: GestureDetector(
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  backgroundColor: GColors.backgroundScaffold,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                  ),
-                  builder: (context) {
-                    return SafeArea(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Container(
-                              width: 40,
-                              height: 4,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(2),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                            child: Text(
-                              'Select Token',
-                              style: GTextStyles.h2,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          ...sendableCurrencies.map((currency) {
-                            return ListTile(
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                              title: Text(
-                                currency.type.ticker.toUpperCase(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              subtitle: Text(
-                                currency.type.name,
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.6),
-                                  fontSize: 14,
-                                ),
-                              ),
-                              onTap: () {
-                                selectedCurrency.value = currency;
-                                Navigator.pop(context);
-                              },
-                            );
-                          }).toList(),
-                          const SizedBox(height: 16),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: GColors.white.withOpacity(0.6),
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      selectedCurrency.value == null
-                          ? 'Select token'
-                          : '${selectedCurrency.value!.type.ticker.toUpperCase()} - ${selectedCurrency.value!.type.name}',
-                      style: TextStyle(
-                        color: selectedCurrency.value == null
-                            ? Colors.white70
-                            : Colors.white,
-                        fontSize: 16,
-                        fontWeight: selectedCurrency.value == null
-                            ? FontWeight.normal
-                            : FontWeight.w500,
-                      ),
-                    ),
-                    Icon(LucideIcons.chevronDown, color: Colors.white),
-                  ],
-                ),
-              ),
+            child: SendCurrencyTab(
+              selectedCurrency,
+              maticBalance.data,
             ),
           ),
         ),
-        if (selectedCurrency.value != null) ...[
-          SliverToBoxAdapter(
-            child: SizedBox(height: GPaddings.medium(context)),
-          ),
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: GPaddings.layoutHorizontalPadding(),
-              ),
-              child: SendCurrencyTab(
-                selectedCurrency.value!,
-                maticBalance.data,
-              ),
-            ),
-          ),
-        ] else ...[
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: GPaddings.layoutHorizontalPadding(),
-                ),
-                child: Text(
-                  'Select a token to send',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
       ],
     );
   }
