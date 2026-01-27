@@ -26,7 +26,7 @@ class GasStationModel {
     required this.safeLow,
   });
 
-  factory GasStationModel.fromJson(Map json) => _$GasStationModelFromJson(json);
+  factory GasStationModel.fromJson(Map<String, dynamic> json) => _$GasStationModelFromJson(json);
 
   @JsonKey(name: 'blockNumber')
   final int blockNumber;

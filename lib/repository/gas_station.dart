@@ -24,7 +24,7 @@ class GasStation {
   static Future<GasStationModel> _getGasStation() async {
     final req = await http.get(Uri.parse(_gasStation));
 
-    final parsed = jsonDecode(req.body) as Map;
+    final parsed = jsonDecode(req.body) as Map<String, dynamic>;
     return GasStationModel.fromJson(parsed);
   }
 

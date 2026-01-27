@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:wallet/components/slivers/spacing.dart';
 import 'package:wallet/layouts/app_layout_sliver.dart';
 import 'package:wallet/models/currency.dart';
 import 'package:wallet/providers/wallet.dart';
@@ -36,7 +37,7 @@ class SendScreen extends HookConsumerWidget {
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: GPaddings.layoutHorizontalPadding(context),
+              horizontal: GPaddings.layoutHorizontalPadding(),
             ),
             child: Text(
               'Send',
@@ -50,7 +51,7 @@ class SendScreen extends HookConsumerWidget {
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: GPaddings.layoutHorizontalPadding(context),
+              horizontal: GPaddings.layoutHorizontalPadding(),
             ),
             child: GestureDetector(
               onTap: () {
@@ -156,7 +157,7 @@ class SendScreen extends HookConsumerWidget {
             hasScrollBody: false,
             child: Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: GPaddings.layoutHorizontalPadding(context),
+                horizontal: GPaddings.layoutHorizontalPadding(),
               ),
               child: SendCurrencyTab(
                 selectedCurrency.value!,
@@ -170,7 +171,7 @@ class SendScreen extends HookConsumerWidget {
             child: Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: GPaddings.layoutHorizontalPadding(context),
+                  horizontal: GPaddings.layoutHorizontalPadding(),
                 ),
                 child: Text(
                   'Select a token to send',
