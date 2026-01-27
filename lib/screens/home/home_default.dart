@@ -24,7 +24,8 @@ class HomePageDefaultFragment extends HookConsumerWidget {
       primary: true,
       slivers: [
         for (final currency in wallet.currencies!.where(
-          (element) => !element.investOnly && !element.exchangeOnly,
+          (element) => !element.investOnly && !element.exchangeOnly &&
+            (element.type != CurrencyTicker.matic || (element.balance.lastValue ?? 0) > 0.000001),
         )) ...[
           GPaddingsLayoutHorizontal.sliver(
             child: Hero(
