@@ -56,12 +56,12 @@ class Uniswap_quote2 extends _i1.GeneratedContract {
   }) async {
     final function = self.abi.functions[1];
     assert(checkSignature(function, 'c6a5026a'));
-    final params = [params];
+    final paramsArray = [params];
     return write(
       credentials,
       transaction,
       function,
-      params,
+      paramsArray,
     );
   }
 
@@ -76,7 +76,7 @@ class Uniswap_quote2 extends _i1.GeneratedContract {
   }) async {
     final function = self.abi.functions[2];
     assert(checkSignature(function, '2f80bb1d'));
-    final params = [
+    final paramsArray = [
       path,
       amountOut,
     ];
@@ -84,7 +84,7 @@ class Uniswap_quote2 extends _i1.GeneratedContract {
       credentials,
       transaction,
       function,
-      params,
+      paramsArray,
     );
   }
 
@@ -98,12 +98,12 @@ class Uniswap_quote2 extends _i1.GeneratedContract {
   }) async {
     final function = self.abi.functions[3];
     assert(checkSignature(function, 'bd21704a'));
-    final params = [params];
+    final paramsArray = [params];
     return write(
       credentials,
       transaction,
       function,
-      params,
+      paramsArray,
     );
   }
 }

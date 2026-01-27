@@ -108,12 +108,12 @@ class Uniswap_router2 extends _i1.GeneratedContract {
   }) async {
     final function = self.abi.functions[4];
     assert(checkSignature(function, 'b858183f'));
-    final params = [params];
+    final paramsArray = [params];
     return write(
       credentials,
       transaction,
       function,
-      params,
+      paramsArray,
     );
   }
 
@@ -127,12 +127,12 @@ class Uniswap_router2 extends _i1.GeneratedContract {
   }) async {
     final function = self.abi.functions[5];
     assert(checkSignature(function, '04e45aaf'));
-    final params = [params];
+    final paramsArray = [params];
     return write(
       credentials,
       transaction,
       function,
-      params,
+      paramsArray,
     );
   }
 
@@ -146,12 +146,12 @@ class Uniswap_router2 extends _i1.GeneratedContract {
   }) async {
     final function = self.abi.functions[6];
     assert(checkSignature(function, '09b81346'));
-    final params = [params];
+    final paramsArray = [params];
     return write(
       credentials,
       transaction,
       function,
-      params,
+      paramsArray,
     );
   }
 
@@ -165,12 +165,12 @@ class Uniswap_router2 extends _i1.GeneratedContract {
   }) async {
     final function = self.abi.functions[7];
     assert(checkSignature(function, '5023b4df'));
-    final params = [params];
+    final paramsArray = [params];
     return write(
       credentials,
       transaction,
       function,
-      params,
+      paramsArray,
     );
   }
 }
