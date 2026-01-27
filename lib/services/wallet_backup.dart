@@ -20,7 +20,7 @@ class WalletBackup {
     this.backupFileVersion = 0,
   });
 
-  factory WalletBackup.fromJson(Map json) => _$WalletBackupFromJson(json);
+  factory WalletBackup.fromJson(Map<String, dynamic> json) => _$WalletBackupFromJson(json);
 
   static Future<WalletBackup> generate(String mnemonic) async {
     final createdAt = DateTime.now();
@@ -58,7 +58,7 @@ class WalletBackup {
 
   static Future<WalletBackup> decrypt(String password, String encrypted) async {
     final result = await computeDecrypt(password, encrypted);
-    final json = jsonDecode(result) as Map;
+    final json = jsonDecode(result) as Map<String, dynamic>;
     return WalletBackup.fromJson(json);
   }
 
@@ -143,43 +143,104 @@ class WalletBackup {
   /// iOS: iCloud ubiquity container
   /// Android: Google Auto Backup (automatic sync to Google Drive)
   /// Silently fails if cloud storage is unavailable (zero UX friction)
-  Future<void> autoSave(String password) async {
+  Future<void> autoSave(String password, {BuildContext? context}) async {
+    print('DEBUG: autoSave() called - starting backup');
+
+    void showMessage(String message) {
+      if (context != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+      print('DEBUG: $message');
+    }
+
     try {
+      showMessage('Encrypting backup...');
       final encrypted = await encrypt(password);
+      showMessage('Backup encrypted (${encrypted.length} chars)');
 
       if (Platform.isIOS) {
-        await _saveToiCloud(encrypted);
+        showMessage('Saving to iCloud...');
+        await _saveToiCloud(encrypted, context: context);
+        showMessage('✓ Backup saved to iCloud');
       } else if (Platform.isAndroid) {
+        showMessage('Saving to Android backup...');
         // Android Auto Backup integration (Phase 1.3 - COMPLETED)
         // Save to app files directory - Android automatically backs up to Google Drive
         // Configuration in backup_rules.xml and data_extraction_rules.xml
         await _saveToAndroidFiles(encrypted);
+        showMessage('✓ Backup saved to app files');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       // Silent failure - do not show error to user
       // This is intentional: ~70-80% iOS users have iCloud enabled
       // For the 20-30% who don't, backup fails silently (zero friction UX)
-      print('Auto-save failed (expected if cloud storage disabled): $e');
+      showMessage('⚠ Auto-save failed: $e');
+      print('DEBUG: Stack trace: $stackTrace');
     }
   }
 
   /// Saves encrypted backup to iOS iCloud ubiquity container
   /// Requires iCloud Documents capability (configured in Runner.entitlements)
-  Future<void> _saveToiCloud(String encryptedBackup) async {
+  Future<void> _saveToiCloud(String encryptedBackup, {BuildContext? context}) async {
+    void showMessage(String message) {
+      if (context != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+      print('DEBUG: $message');
+    }
+
     try {
+      showMessage('Requesting iCloud container path...');
       // Request iCloud container path from iOS native code
       final iCloudPath = await _platform.invokeMethod<String>('getICloudPath');
 
       if (iCloudPath == null) {
+        showMessage('⚠ iCloud container NOT available (null)');
         throw Exception('iCloud container not available');
+      }
+
+      showMessage('✓ iCloud path: $iCloudPath');
+
+      // Ensure Documents directory exists (defensive programming)
+      final directory = Directory(iCloudPath);
+      if (!await directory.exists()) {
+        showMessage('Creating iCloud Documents directory...');
+        await directory.create(recursive: true);
+        showMessage('✓ Directory created');
       }
 
       // Save encrypted backup to iCloud
       final backupFile = File('$iCloudPath/wallet_backup.txt');
+      showMessage('Writing file to iCloud...');
       await backupFile.writeAsString(encryptedBackup);
 
+      // VERIFY: Check if file actually exists and has content
+      final fileExists = await backupFile.exists();
+
+      if (fileExists) {
+        final fileSize = await backupFile.length();
+        final fileContent = await backupFile.readAsString();
+        final matches = fileContent == encryptedBackup;
+        showMessage('✓ File written ($fileSize bytes, verified: $matches)');
+      } else {
+        showMessage('⚠ File verification FAILED - file does not exist!');
+        throw Exception('File write verification failed - file does not exist');
+      }
+
       // iOS automatically syncs to iCloud - no additional code needed
-    } catch (e) {
+    } catch (e, stackTrace) {
+      showMessage('⚠ iCloud save failed: $e');
+      print('DEBUG: Stack trace: $stackTrace');
       rethrow;
     }
   }

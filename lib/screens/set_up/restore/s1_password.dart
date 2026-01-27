@@ -18,6 +18,9 @@ class SetUpRestore1PasswordStep extends SetUpStep {
   @override
   String get name => 'Enter the password to decrypt the backup file';
 
+  // Store context for use in submit function (needed for SnackBar feedback)
+  BuildContext? _currentContext;
+
   @override
   Future<bool> Function(WidgetRef ref) get submit => (ref) async {
         // trying to decrypt the backup file
@@ -43,7 +46,7 @@ class SetUpRestore1PasswordStep extends SetUpStep {
 
           // Phase 1: Silent auto-save to app files for cloud backup
           // We do NOT await this to prevent UI hangs on platform channel calls (iCloud/Android Backup)
-          backup.autoSave(provider.password!);
+          backup.autoSave(provider.password!, context: _currentContext);
 
           return true;
         } catch (e) {
@@ -77,6 +80,9 @@ class SetUpRestore1PasswordStep extends SetUpStep {
 
   @override
   Widget buildContent(BuildContext context, WidgetRef ref) {
+    // Store context for use in submit function (enables SnackBar feedback)
+    _currentContext = context;
+
     final password = useTextEditingController();
 
     useEffect(() {

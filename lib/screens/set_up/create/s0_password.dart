@@ -21,6 +21,9 @@ class SetUpCreate0PasswordStep extends SetUpStep {
   @override
   String get name => 'Create your password';
 
+  // Store context for use in submit function (needed for SnackBar feedback)
+  BuildContext? _currentContext;
+
   @override
   Future<bool> Function(WidgetRef ref) get submit => (ref) async {
         final setupService = ref.read(setUpCreateProvider);
@@ -52,7 +55,7 @@ class SetUpCreate0PasswordStep extends SetUpStep {
         await walletService.saveBackupWallet(encryptedFile);
         developer.log('PASSWORD STEP 7: Backup saved to Hive', name: 'GAUwallet');
 
-        backup.autoSave(setupService.password!);
+        backup.autoSave(setupService.password!, context: _currentContext);
         developer.log('PASSWORD STEP 8: Wallet creation complete, auto-save triggered', name: 'GAUwallet');
 
         return true;
@@ -94,6 +97,9 @@ class SetUpCreate0PasswordStep extends SetUpStep {
 
   @override
   Widget buildContent(BuildContext context, WidgetRef ref) {
+    // Store context for use in submit function (enables SnackBar feedback)
+    _currentContext = context;
+
     final password = useTextEditingController();
     final passwordRepeat = useTextEditingController();
     final provider = ref.watch(setUpCreateProvider);
