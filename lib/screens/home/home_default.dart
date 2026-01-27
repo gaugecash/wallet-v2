@@ -82,16 +82,6 @@ class HomePageDefaultFragment extends HookConsumerWidget {
               // ),
               Expanded(
                 child: GWalletActionButton(
-                  label: 'Buy GAU',
-                  icon: LucideIcons.dollarSign,
-                  onPressed: () {
-                    context.router.pushNamed('/buy_gau');
-                  },
-                ),
-              ),
-              SizedBox(width: GPaddings.small(context)),
-              Expanded(
-                child: GWalletActionButton(
                   label: 'Swap',
                   icon: LucideIcons.arrowLeftRight,
                   onPressed: () {
