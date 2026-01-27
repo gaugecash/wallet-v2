@@ -12,12 +12,23 @@ import 'package:wallet/styling.dart';
 
 @RoutePage()
 class SendScreen extends HookConsumerWidget {
-  const SendScreen({super.key});
+  const SendScreen({super.key, @QueryParam('ticker') this.preselectedTicker});
+
+  final String? preselectedTicker;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final wallet = ref.read(walletProvider);
-    final selectedCurrency = useState<Currency?>(null);
+
+    // Pre-select currency if ticker is provided
+    final Currency? initialCurrency = preselectedTicker != null
+        ? wallet.currencies?.firstWhere(
+            (c) => c.type.ticker.toLowerCase() == preselectedTicker!.toLowerCase(),
+            orElse: () => wallet.currencies!.first,
+          )
+        : null;
+
+    final selectedCurrency = useState<Currency?>(initialCurrency);
 
     // Get MATIC balance for gasless fee calculation
     final matic = wallet.currencies!.firstWhere(
