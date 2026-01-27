@@ -88,5 +88,10 @@
 			<string>Any</string>
 		</dict>
 	</dict>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>whatsapp</string>
+		<string>tg</string>
+	</array>
 	</dict>
 </plist>

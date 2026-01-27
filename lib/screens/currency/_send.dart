@@ -24,15 +24,8 @@ class SendCurrencyTab extends HookWidget {
     final addr = useTextEditingController();
     final amount = useTextEditingController();
 
-    final useGauForFee = useState(false);  // Gasless by default
-
-    useEffect(
-      () {
-        // Already defaults to true (gasless), no need to change
-        return null;
-      },
-      [maticBalance],
-    );
+    // Smart gasless auto-detection based on POL balance
+    final shouldUseGasless = (maticBalance ?? 0) < 0.05;
 
     final amountWidget = currency.type == CurrencyTicker.gau
         ? GPrimaryInput(
@@ -96,33 +89,24 @@ class SendCurrencyTab extends HookWidget {
             ),
           ),
         ),
+        SliverToBoxAdapter(child: SizedBox(height: GPaddings.big(context))),
         if (currency.type == CurrencyTicker.gau || currency.type == CurrencyTicker.usdt) ...[
           SliverToBoxAdapter(
-            child: SizedBox(height: GPaddings.small(context)),
-          ),
-          SliverToBoxAdapter(
-            child: CheckboxListTile(
-              title: const Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  'Gasless transfer (pay fee with token)',
-                  style: GTextStyles.poppinsMediumButton,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Text(
+                shouldUseGasless
+                    ? 'Gas fee: Covered by Relayer'
+                    : 'Gas fee: ~${(maticBalance ?? 0) * 0.0001} POL',
+                style: TextStyle(
+                  color: GColors.white.withOpacity(0.7),
+                  fontSize: 14,
                 ),
+                textAlign: TextAlign.center,
               ),
-              visualDensity: const VisualDensity(horizontal: -3, vertical: -4),
-              contentPadding: EdgeInsets.zero,
-              controlAffinity: ListTileControlAffinity.trailing,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              value: useGauForFee.value,
-              onChanged: (el) {
-                useGauForFee.value = el!;
-              },
             ),
           ),
         ],
-        SliverToBoxAdapter(child: SizedBox(height: GPaddings.big(context))),
         SliverToBoxAdapter(
           child: GPrimaryButton(
             label: 'Send',
@@ -137,7 +121,7 @@ class SendCurrencyTab extends HookWidget {
                 currency: currency,
                 address: addr.text,
                 useMetaIfPossible:
-                    (currency.type == CurrencyTicker.gau || currency.type == CurrencyTicker.usdt) && useGauForFee.value,
+                    (currency.type == CurrencyTicker.gau || currency.type == CurrencyTicker.usdt) && shouldUseGasless,
               );
 
               final tx = currency.repo.send(data);

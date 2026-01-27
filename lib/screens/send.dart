@@ -52,53 +52,98 @@ class SendScreen extends HookConsumerWidget {
             padding: EdgeInsets.symmetric(
               horizontal: GPaddings.layoutHorizontalPadding(context),
             ),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: GColors.white.withOpacity(0.6),
-                  width: 2,
-                ),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              child: DropdownButton<Currency>(
-                value: selectedCurrency.value,
-                hint: const Text(
-                  'Select token',
-                  style: TextStyle(color: Colors.white70),
-                ),
-                isExpanded: true,
-                underline: const SizedBox(),
-                dropdownColor: GColors.backgroundScaffold,
-                icon: const Icon(LucideIcons.chevronDown, color: Colors.white),
-                items: sendableCurrencies.map((Currency currency) {
-                  return DropdownMenuItem<Currency>(
-                    value: currency,
-                    child: Row(
-                      children: [
-                        Text(
-                          currency.type.ticker.toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+            child: GestureDetector(
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  backgroundColor: GColors.backgroundScaffold,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                  ),
+                  builder: (context) {
+                    return SafeArea(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Container(
+                              width: 40,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          currency.type.name,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.6),
-                            fontSize: 14,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                            child: Text(
+                              'Select Token',
+                              style: GTextStyles.h2,
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 8),
+                          ...sendableCurrencies.map((currency) {
+                            return ListTile(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                              title: Text(
+                                currency.type.ticker.toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              subtitle: Text(
+                                currency.type.name,
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.6),
+                                  fontSize: 14,
+                                ),
+                              ),
+                              onTap: () {
+                                selectedCurrency.value = currency;
+                                Navigator.pop(context);
+                              },
+                            );
+                          }).toList(),
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: GColors.white.withOpacity(0.6),
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      selectedCurrency.value == null
+                          ? 'Select token'
+                          : '${selectedCurrency.value!.type.ticker.toUpperCase()} - ${selectedCurrency.value!.type.name}',
+                      style: TextStyle(
+                        color: selectedCurrency.value == null
+                            ? Colors.white70
+                            : Colors.white,
+                        fontSize: 16,
+                        fontWeight: selectedCurrency.value == null
+                            ? FontWeight.normal
+                            : FontWeight.w500,
+                      ),
                     ),
-                  );
-                }).toList(),
-                onChanged: (Currency? currency) {
-                  selectedCurrency.value = currency;
-                },
+                    Icon(LucideIcons.chevronDown, color: Colors.white),
+                  ],
+                ),
               ),
             ),
           ),
