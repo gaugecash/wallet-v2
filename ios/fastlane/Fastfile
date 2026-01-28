@@ -92,7 +92,8 @@ platform :ios do
       skip_binary_upload: false,
       submit_for_review: true,
       automatic_release: true,
-      force: true
+      force: true,
+      precheck_include_in_app_purchases: false
     )
 
     UI.success("Successfully uploaded to App Store and submitted for review!")
