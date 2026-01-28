@@ -197,27 +197,27 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.gaugecash.wallet
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
-          track: internal
+          track: production
           status: completed
 
       - name: ✅ Build Complete
         run: |
           echo "╔══════════════════════════════════════════════════════════╗"
           echo "║  ✅ ANDROID RELEASE AAB BUILT SUCCESSFULLY              ║"
-          echo "║  ✅ UPLOADED TO GOOGLE PLAY (INTERNAL TRACK)            ║"
+          echo "║  ✅ UPLOADED TO GOOGLE PLAY (PRODUCTION)                ║"
           echo "╚══════════════════════════════════════════════════════════╝"
           echo ""
           echo "📦 AAB file location:"
           echo "   build/app/outputs/bundle/release/app-release.aab"
           echo ""
           echo "🚀 Deployed to:"
-          echo "   - Google Play Console (Internal Testing)"
+          echo "   - Google Play Console (Production)"
           echo "   - GitHub Actions Artifacts (90 day retention)"
           echo ""
           echo "📝 Next steps:"
-          echo "   1. Go to Google Play Console"
-          echo "   2. Review the internal release"
-          echo "   3. Promote to production when ready"
+          echo "   1. Monitor Google Play Console for rollout status"
+          echo "   2. Check user reviews and crash reports"
+          echo "   3. App will be live to 100% of users"
 
   # ============================================
   # MANUAL: Build iOS Release IPA
