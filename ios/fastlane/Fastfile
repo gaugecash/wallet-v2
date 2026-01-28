@@ -84,16 +84,18 @@ platform :ios do
     # Build and sign
     build_signed
 
-    # Upload to App Store
+    # Upload to App Store and submit for review
+    # (API key is already configured in before_all)
     upload_to_app_store(
-      api_key_path: "./fastlane/keys/AuthKey_6584299DC9.p8",
       skip_metadata: true,
       skip_screenshots: true,
       skip_binary_upload: false,
+      submit_for_review: true,
+      automatic_release: true,
       force: true
     )
 
-    UI.success("Successfully uploaded to App Store!")
+    UI.success("Successfully uploaded to App Store and submitted for review!")
   end
 
   desc "Setup code signing with Match"

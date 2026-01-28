@@ -272,10 +272,10 @@ jobs:
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
 
-      - name: 🚀 Upload to TestFlight
+      - name: 🚀 Upload to App Store and Submit for Review
         run: |
           cd ios
-          fastlane beta
+          fastlane release
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
@@ -293,17 +293,19 @@ jobs:
       - name: ✅ Deployment Complete
         run: |
           echo "╔══════════════════════════════════════════════════════════╗"
-          echo "║  ✅ iOS APP BUILT AND UPLOADED TO TESTFLIGHT            ║"
+          echo "║  ✅ iOS APP SUBMITTED TO APP STORE FOR REVIEW           ║"
           echo "╚══════════════════════════════════════════════════════════╝"
           echo ""
           echo "📦 IPA file location:"
           echo "   ios/build/GAUGECASH.ipa"
           echo ""
-          echo "🚀 Deployed to:"
-          echo "   - TestFlight (processing may take 10-15 minutes)"
+          echo "🚀 Deployment status:"
+          echo "   - Uploaded to App Store Connect"
+          echo "   - Submitted for Apple Review (automatic)"
+          echo "   - Will auto-release after approval (1-2 days)"
           echo "   - GitHub Actions Artifacts (90 day retention)"
           echo ""
           echo "📝 Next steps:"
-          echo "   1. Go to App Store Connect"
-          echo "   2. Wait for build processing to complete"
-          echo "   3. Add to testers or submit for review"
+          echo "   1. Monitor App Store Connect for review status"
+          echo "   2. Check email for any review feedback from Apple"
+          echo "   3. App will go live automatically after approval"
