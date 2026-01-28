@@ -19,7 +19,7 @@ class HomePageDefaultFragment extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     useAutomaticKeepAlive();
 
-    final wallet = ref.read(walletProvider);
+    final wallet = ref.watch(walletProvider);
 
     return CustomScrollView(
       primary: true,

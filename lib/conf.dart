@@ -129,3 +129,4 @@ const int breakPointWidth = 700;
 
 const double polVisibilityThreshold = 0.000001;
 const double gaslessBalanceThreshold = 0.05;
+const double polMaxSendReserve = 0.01;

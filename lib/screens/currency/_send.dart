@@ -68,6 +68,48 @@ class SendCurrencyTab extends HookWidget {
       slivers: [
         SliverToBoxAdapter(child: SizedBox(height: GPaddings.small(context))),
         SliverToBoxAdapter(child: amountWidget),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () {
+                  final currentBalance = currency.balance.lastValue ?? 0;
+                  double maxAmount;
+
+                  if (currency.type == CurrencyTicker.matic) {
+                    // POL: subtract estimated gas fee
+                    maxAmount = currentBalance - polMaxSendReserve;
+                  } else if ((currency.type == CurrencyTicker.gau || currency.type == CurrencyTicker.usdt) && shouldUseGasless) {
+                    // Gasless tokens (GAU/USDT with meta-tx): use full balance
+                    maxAmount = currentBalance;
+                  } else {
+                    // Other tokens: use full balance
+                    maxAmount = currentBalance;
+                  }
+
+                  // Ensure non-negative
+                  if (maxAmount < 0) maxAmount = 0;
+
+                  // Format to reasonable precision (8 decimals)
+                  amount.text = maxAmount.toStringAsFixed(8).replaceAll(RegExp(r'\.?0+$'), '');
+                },
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                ),
+                child: Text(
+                  'MAX',
+                  style: TextStyle(
+                    color: GColors.white.withValues(alpha: 0.7),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         SliverToBoxAdapter(child: SizedBox(height: GPaddings.medium(context))),
         SliverToBoxAdapter(
           child: GPrimaryInput(
