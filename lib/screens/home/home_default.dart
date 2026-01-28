@@ -21,13 +21,22 @@ class HomePageDefaultFragment extends HookConsumerWidget {
 
     final wallet = ref.watch(walletProvider);
 
+    // Subscribe to POL balance stream to force rebuild when balance changes.
+    // This ensures the visibility filter re-runs with fresh data.
+    final pols = wallet.currencies?.where((c) => c.type == CurrencyTicker.matic);
+    if (pols != null && pols.isNotEmpty) {
+      useStream(pols.first.balance.stream);
+    }
+
+    final filteredCurrencies = wallet.currencies!.where(
+      (element) => !element.investOnly && !element.exchangeOnly &&
+        (element.type != CurrencyTicker.matic || (element.balance.lastValue ?? 0) > polVisibilityThreshold),
+    ).toList();
+
     return CustomScrollView(
       primary: true,
       slivers: [
-        for (final currency in wallet.currencies!.where(
-          (element) => !element.investOnly && !element.exchangeOnly &&
-            (element.type != CurrencyTicker.matic || (element.balance.lastValue ?? 0) > polVisibilityThreshold),
-        )) ...[
+        for (final currency in filteredCurrencies) ...[
           GPaddingsLayoutHorizontal.sliver(
             child: Hero(
               tag: currency.type.ticker,
@@ -44,28 +53,6 @@ class HomePageDefaultFragment extends HookConsumerWidget {
           SliverToBoxAdapter(
             child: SizedBox(height: GPaddings.small(context)),
           ),
-          // if (currency.type == CurrencyTicker.gau) ...[
-          //   SliverToBoxAdapter(
-          //     child: SizedBox(height: GPaddings.small(context)),
-          //   ),
-          //   GPaddingsLayoutHorizontal.sliver(
-          //     child: Container(
-          //       height: 2,
-          //       margin: const EdgeInsets.symmetric(horizontal: 12),
-          //       decoration: BoxDecoration(
-          //         borderRadius: BorderRadius.circular(2),
-          //         color: GColors.white.withValues(alpha: 0.2),
-          //       ),
-          //     ),
-          //   ),
-          //   SliverToBoxAdapter(
-          //     child: SizedBox(height: GPaddings.small(context)),
-          //   ),
-          // ],
-          // if (currency.type != CurrencyTicker.gau)
-          //   SliverToBoxAdapter(
-          //     child: SizedBox(height: GPaddings.small(context)),
-          //   ),
         ],
 
         // SliverToBoxAdapter(child: SizedBox(height: GPaddings.tiny(context))),

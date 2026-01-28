@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -48,6 +49,8 @@ class WalletBackup {
   final int backupFileVersion;
 
   Map<String, dynamic> toJson() => _$WalletBackupToJson(this);
+
+  static const String _backupFileName = 'wallet_backup.txt';
 
   // todo handle errors
   Future<String> encrypt(String password) async {
@@ -137,13 +140,10 @@ class WalletBackup {
     }
   }
 
-  /// Platform channel for iOS/Android native code
-  static const _platform = MethodChannel('com.gaugecash.wallet/backup');
-
-  /// Auto-saves encrypted backup to platform-specific cloud storage
-  /// iOS: iCloud ubiquity container
-  /// Android: Google Auto Backup (automatic sync to Google Drive)
-  /// Silently fails if cloud storage is unavailable (zero UX friction)
+  /// Auto-saves encrypted backup to local storage
+  /// iOS: Application Support directory (auto-backed up by iCloud Backup)
+  /// Android: Application Documents directory (auto-backed up by Google Auto Backup)
+  /// Silently fails if storage is unavailable (zero UX friction)
   Future<void> autoSave(String password, {BuildContext? context}) async {
     print('DEBUG: autoSave() called - starting backup');
 
@@ -164,17 +164,13 @@ class WalletBackup {
       final encrypted = await encrypt(password);
       showMessage('Backup encrypted (${encrypted.length} chars)');
 
+      showMessage('Saving to local storage...');
+      await _saveToLocalStorage(encrypted);
+
       if (Platform.isIOS) {
-        showMessage('Saving to iCloud...');
-        await _saveToiCloud(encrypted, context: context);
-        showMessage('✓ Backup saved to iCloud');
+        showMessage('✓ Backup saved (auto-backed up by iCloud Backup)');
       } else if (Platform.isAndroid) {
-        showMessage('Saving to Android backup...');
-        // Android Auto Backup integration (Phase 1.3 - COMPLETED)
-        // Save to app files directory - Android automatically backs up to Google Drive
-        // Configuration in backup_rules.xml and data_extraction_rules.xml
-        await _saveToAndroidFiles(encrypted);
-        showMessage('✓ Backup saved to app files');
+        showMessage('✓ Backup saved (auto-backed up by Google Auto Backup)');
       }
     } catch (e, stackTrace) {
       // Silent failure - do not show error to user
@@ -185,139 +181,86 @@ class WalletBackup {
     }
   }
 
-  /// Saves encrypted backup to iOS iCloud ubiquity container
-  /// Requires iCloud Documents capability (configured in Runner.entitlements)
-  Future<void> _saveToiCloud(String encryptedBackup, {BuildContext? context}) async {
-    void showMessage(String message) {
-      if (context != null && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
-      print('DEBUG: $message');
-    }
-
+  /// Saves encrypted backup to local storage
+  /// iOS: Application Support directory (hidden from user, auto-backed up by iCloud Backup)
+  /// Android: Application Documents directory (auto-backed up by Google Auto Backup)
+  Future<void> _saveToLocalStorage(String encryptedBackup) async {
     try {
-      showMessage('Requesting iCloud container path...');
-      // Request iCloud container path from iOS native code
-      final iCloudPath = await _platform.invokeMethod<String>('getICloudPath');
-
-      if (iCloudPath == null) {
-        showMessage('⚠ iCloud container NOT available (null)');
-        throw Exception('iCloud container not available');
-      }
-
-      showMessage('✓ iCloud path: $iCloudPath');
-
-      // Ensure Documents directory exists (defensive programming)
-      final directory = Directory(iCloudPath);
-      if (!await directory.exists()) {
-        showMessage('Creating iCloud Documents directory...');
-        await directory.create(recursive: true);
-        showMessage('✓ Directory created');
-      }
-
-      // Save encrypted backup to iCloud
-      final backupFile = File('$iCloudPath/wallet_backup.txt');
-      showMessage('Writing file to iCloud...');
-      await backupFile.writeAsString(encryptedBackup);
-
-      // VERIFY: Check if file actually exists and has content
-      final fileExists = await backupFile.exists();
-
-      if (fileExists) {
-        final fileSize = await backupFile.length();
-        final fileContent = await backupFile.readAsString();
-        final matches = fileContent == encryptedBackup;
-        showMessage('✓ File written ($fileSize bytes, verified: $matches)');
+      // Get platform-specific directory
+      final Directory directory;
+      if (Platform.isIOS) {
+        // iOS: Use Application Support directory (hidden from user, auto-backed up)
+        directory = await getApplicationSupportDirectory();
       } else {
-        showMessage('⚠ File verification FAILED - file does not exist!');
-        throw Exception('File write verification failed - file does not exist');
+        // Android: Use Application Documents directory (auto-backed up by Google Auto Backup)
+        directory = await getApplicationDocumentsDirectory();
       }
 
-      // iOS automatically syncs to iCloud - no additional code needed
+      developer.log('LOCAL BACKUP: Target directory: ${directory.path}', name: 'GAUwallet');
+
+      // Ensure directory exists (defensive programming)
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+
+      // ATOMIC WRITE: Write to temporary file first, then rename
+      final finalPath = '${directory.path}/$_backupFileName';
+      final tempPath = '$finalPath.tmp';
+      
+      final tempFile = File(tempPath);
+      await tempFile.writeAsString(encryptedBackup);
+      
+      // Rename is an atomic operation at the OS level
+      await tempFile.rename(finalPath);
+
+      developer.log('LOCAL BACKUP: File saved successfully to $finalPath', name: 'GAUwallet');
+
+      // System-level backup handles cloud sync:
+      // - iOS: iCloud Backup (automatic, when device locked + charging + WiFi)
+      // - Android: Google Auto Backup (automatic, when idle + charging + WiFi)
     } catch (e, stackTrace) {
-      showMessage('⚠ iCloud save failed: $e');
-      print('DEBUG: Stack trace: $stackTrace');
+      developer.log('LOCAL BACKUP ERROR: Failed to save backup', error: e, stackTrace: stackTrace, name: 'GAUwallet');
       rethrow;
     }
   }
 
-  /// Saves encrypted backup to Android app files directory
-  /// Android Auto Backup automatically syncs this to Google Drive
-  /// Configuration in backup_rules.xml and data_extraction_rules.xml
-  Future<void> _saveToAndroidFiles(String encryptedBackup) async {
-    try {
-      // Get app documents directory (automatically backed up by Android)
-      final directory = await getApplicationDocumentsDirectory();
-
-      // Save encrypted backup to app files
-      final backupFile = File('${directory.path}/wallet_backup.txt');
-      await backupFile.writeAsString(encryptedBackup);
-
-      // Android Auto Backup automatically syncs to Google Drive when:
-      // - User has backup enabled in Android settings
-      // - Device is idle, charging, and on Wi-Fi
-      // - Less than 24 hours since last backup
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  /// Checks if an auto-saved backup exists in platform-specific cloud storage
+  /// Checks if an auto-saved backup exists in local storage
   /// Returns the encrypted backup string if found, null otherwise
   static Future<String?> checkForAutoSavedBackup() async {
     try {
+      return await _checkLocalBackup();
+    } catch (e, stackTrace) {
+      developer.log('LOCAL BACKUP ERROR: Error checking for backup', error: e, stackTrace: stackTrace, name: 'GAUwallet');
+      return null;
+    }
+  }
+
+  /// Checks for backup in local storage
+  /// iOS: Application Support directory
+  /// Android: Application Documents directory
+  static Future<String?> _checkLocalBackup() async {
+    try {
+      // Get platform-specific directory
+      final Directory directory;
       if (Platform.isIOS) {
-        return await _checkiCloudBackup();
-      } else if (Platform.isAndroid) {
-        return await _checkAndroidBackup();
-      }
-      return null;
-    } catch (e) {
-      // Silent failure
-      return null;
-    }
-  }
-
-  /// Checks for backup in iOS iCloud ubiquity container
-  static Future<String?> _checkiCloudBackup() async {
-    try {
-      final iCloudPath = await _platform.invokeMethod<String>('getICloudPath');
-
-      if (iCloudPath == null) {
-        return null;
+        directory = await getApplicationSupportDirectory();
+      } else {
+        directory = await getApplicationDocumentsDirectory();
       }
 
-      final backupFile = File('$iCloudPath/wallet_backup.txt');
+      final backupFile = File('${directory.path}/$_backupFileName');
 
       if (await backupFile.exists()) {
-        return await backupFile.readAsString();
+        final content = await backupFile.readAsString();
+        developer.log('LOCAL BACKUP: Found existing backup (${content.length} chars)', name: 'GAUwallet');
+        return content;
       }
 
+      developer.log('LOCAL BACKUP: No existing backup found in ${directory.path}', name: 'GAUwallet');
       return null;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  /// Checks for backup in Android app files directory
-  /// Android Auto Backup syncs files to/from Google Drive automatically
-  static Future<String?> _checkAndroidBackup() async {
-    try {
-      final directory = await getApplicationDocumentsDirectory();
-      final backupFile = File('${directory.path}/wallet_backup.txt');
-
-      if (await backupFile.exists()) {
-        return await backupFile.readAsString();
-      }
-
-      return null;
-    } catch (e) {
-      return null;
+    } catch (e, stackTrace) {
+      developer.log('LOCAL BACKUP ERROR: Failed to read backup file', error: e, stackTrace: stackTrace, name: 'GAUwallet');
+      rethrow;
     }
   }
 }
