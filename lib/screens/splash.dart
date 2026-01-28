@@ -15,6 +15,7 @@ import 'package:wallet/main.dart';
 import 'package:wallet/providers/auth.dart';
 import 'package:wallet/providers/wallet.dart';
 import 'package:wallet/repository/rpc.dart';
+import 'package:wallet/services/wallet_backup.dart';
 
 @RoutePage()
 class SplashScreen extends HookConsumerWidget {
@@ -22,27 +23,28 @@ class SplashScreen extends HookConsumerWidget {
 
   Future<List<int>> _getStorageKey() async {
     late List<int> key;
-    // DISABLED FOR TESTING - FlutterSecureStorage completely bypassed
-    // developer.log('KEYCHAIN STEP 1: Creating FlutterSecureStorage', name: 'GAUwallet');
-    // const secureStorage = FlutterSecureStorage();
+    const secureStorage = FlutterSecureStorage();
 
-    // developer.log('KEYCHAIN STEP 2: Reading from secure storage (FREEZE POINT?)', name: 'GAUwallet');
-    // final containsEncryptionKey = await secureStorage.read(key: 'hive');
-    // developer.log('KEYCHAIN STEP 3: Secure storage read completed', name: 'GAUwallet');
+    try {
+      final containsEncryptionKey = await secureStorage.read(key: 'hive');
 
-    // DUMMY: Always generate a new key (no keychain access)
-    // if (containsEncryptionKey == null) {
-      // developer.log('KEYCHAIN STEP 4: No key found, generating new', name: 'GAUwallet');
+      if (containsEncryptionKey == null) {
+        // First launch - generate and save key
+        developer.log('KEYCHAIN: No key found, generating new', name: 'GAUwallet');
+        key = Hive.generateSecureKey();
+        await secureStorage.write(key: 'hive', value: base64Encode(key));
+      } else {
+        // Subsequent launches - reuse existing key
+        developer.log('KEYCHAIN: Existing key found', name: 'GAUwallet');
+        key = base64Decode(containsEncryptionKey);
+      }
+    } catch (e, stackTrace) {
+      developer.log('KEYCHAIN ERROR: Failed to access secure storage', error: e, stackTrace: stackTrace, name: 'GAUwallet');
+      // Fallback: Generate a temporary session key so the app doesn't crash, 
+      // but warn that data won't persist across boots.
       key = Hive.generateSecureKey();
-      // developer.log('KEYCHAIN STEP 5: Writing new key to secure storage (FREEZE POINT?)', name: 'GAUwallet');
-      // await secureStorage.write(key: 'hive', value: base64Encode(key));
-      // developer.log('KEYCHAIN STEP 6: Key write completed', name: 'GAUwallet');
-    // } else {
-    //   developer.log('KEYCHAIN STEP 4: Key exists, decoding', name: 'GAUwallet');
-    //   key = base64Decode(containsEncryptionKey);
-    // }
+    }
 
-    // developer.log('KEYCHAIN STEP 7: Returning key', name: 'GAUwallet');
     return key;
   }
 
@@ -83,20 +85,28 @@ class SplashScreen extends HookConsumerWidget {
     final clientInitResult = await client.init();
 
     if (!clientInitResult) {
-      context.router.replaceNamed('/network_error');
+      if (context.mounted) {
+        context.router.replaceNamed('/network_error');
+      }
       return;
     }
 
     await auth.init();
+    developer.log('DEBUG: INIT - authProvider.setUp: ${auth.setUp}', name: 'GAUwallet');
+    developer.log('DEBUG: INIT - authProvider.isAuthenticated: ${auth.isAuthenticated}', name: 'GAUwallet');
 
     if (auth.setUp && !auth.isAuthenticated) {
-      context.router.replaceNamed('/auth');
+      developer.log('DEBUG: INIT - Navigating to /auth (Biometrics/PIN)', name: 'GAUwallet');
+      if (context.mounted) {
+        context.router.replaceNamed('/auth');
+      }
 
       return;
     }
 
     // already authenticated
     // if(!wallet.initialized){
+    developer.log('DEBUG: INIT - Initializing walletProvider', name: 'GAUwallet');
     await wallet.init(client);
     // }
 
@@ -106,11 +116,31 @@ class SplashScreen extends HookConsumerWidget {
         ref.read(authProvider).setUp && ref.read(walletProvider).wallet != null;
 
     logger.i('is set up: $isSetUp');
+    developer.log('DEBUG: INIT - isSetUp final result: $isSetUp', name: 'GAUwallet');
 
     if (isSetUp) {
-      context.router.replaceNamed('/home');
+      developer.log('DEBUG: INIT - Navigating to /home', name: 'GAUwallet');
+      if (context.mounted) {
+        context.router.replaceNamed('/home');
+      }
     } else {
-      context.router.replaceNamed('/set_up');
+      // No wallet found in Hive - check for auto-saved backup
+      final autoSavedBackup = await WalletBackup.checkForAutoSavedBackup();
+
+      // VALIDATION: Only navigate to restore if content is a valid backup format
+      final isValidBackup = autoSavedBackup != null && WalletBackup.validate(autoSavedBackup);
+
+      if (isValidBackup) {
+        developer.log('DEBUG: INIT - Valid auto-saved backup found, navigating to /set_up/restore', name: 'GAUwallet');
+        if (context.mounted) {
+          context.router.replaceNamed('/set_up/restore');
+        }
+      } else {
+        developer.log('DEBUG: INIT - No valid backup found, navigating to /set_up (intro)', name: 'GAUwallet');
+        if (context.mounted) {
+          context.router.replaceNamed('/set_up');
+        }
+      }
     }
   }
 

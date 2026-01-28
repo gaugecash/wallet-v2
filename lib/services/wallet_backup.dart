@@ -196,10 +196,11 @@ class WalletBackup {
         directory = await getApplicationDocumentsDirectory();
       }
 
-      developer.log('LOCAL BACKUP: Target directory: ${directory.path}', name: 'GAUwallet');
+      developer.log('DEBUG: LOCAL BACKUP - Save target directory: ${directory.path}', name: 'GAUwallet');
 
       // Ensure directory exists (defensive programming)
       if (!await directory.exists()) {
+        developer.log('DEBUG: LOCAL BACKUP - Directory does not exist, creating...', name: 'GAUwallet');
         await directory.create(recursive: true);
       }
 
@@ -207,19 +208,23 @@ class WalletBackup {
       final finalPath = '${directory.path}/$_backupFileName';
       final tempPath = '$finalPath.tmp';
       
+      developer.log('DEBUG: LOCAL BACKUP - Writing to temp file: $tempPath', name: 'GAUwallet');
       final tempFile = File(tempPath);
       await tempFile.writeAsString(encryptedBackup);
       
+      developer.log('DEBUG: LOCAL BACKUP - Renaming to final path: $finalPath', name: 'GAUwallet');
       // Rename is an atomic operation at the OS level
       await tempFile.rename(finalPath);
 
-      developer.log('LOCAL BACKUP: File saved successfully to $finalPath', name: 'GAUwallet');
+      // VERIFY: Check if file actually exists now
+      final exists = await File(finalPath).exists();
+      developer.log('DEBUG: LOCAL BACKUP - Save complete. File exists at final path: $exists', name: 'GAUwallet');
 
       // System-level backup handles cloud sync:
       // - iOS: iCloud Backup (automatic, when device locked + charging + WiFi)
       // - Android: Google Auto Backup (automatic, when idle + charging + WiFi)
     } catch (e, stackTrace) {
-      developer.log('LOCAL BACKUP ERROR: Failed to save backup', error: e, stackTrace: stackTrace, name: 'GAUwallet');
+      developer.log('DEBUG: LOCAL BACKUP ERROR: Failed to save backup', error: e, stackTrace: stackTrace, name: 'GAUwallet');
       rethrow;
     }
   }
@@ -227,10 +232,13 @@ class WalletBackup {
   /// Checks if an auto-saved backup exists in local storage
   /// Returns the encrypted backup string if found, null otherwise
   static Future<String?> checkForAutoSavedBackup() async {
+    developer.log('DEBUG: LOCAL BACKUP - checkForAutoSavedBackup() called', name: 'GAUwallet');
     try {
-      return await _checkLocalBackup();
+      final result = await _checkLocalBackup();
+      developer.log('DEBUG: LOCAL BACKUP - checkForAutoSavedBackup() returning ${result != null ? "FOUND" : "NOT FOUND"}', name: 'GAUwallet');
+      return result;
     } catch (e, stackTrace) {
-      developer.log('LOCAL BACKUP ERROR: Error checking for backup', error: e, stackTrace: stackTrace, name: 'GAUwallet');
+      developer.log('DEBUG: LOCAL BACKUP ERROR: Error checking for backup', error: e, stackTrace: stackTrace, name: 'GAUwallet');
       return null;
     }
   }
@@ -248,18 +256,21 @@ class WalletBackup {
         directory = await getApplicationDocumentsDirectory();
       }
 
-      final backupFile = File('${directory.path}/$_backupFileName');
+      final backupPath = '${directory.path}/$_backupFileName';
+      developer.log('DEBUG: LOCAL BACKUP - Checking for file at: $backupPath', name: 'GAUwallet');
+
+      final backupFile = File(backupPath);
 
       if (await backupFile.exists()) {
         final content = await backupFile.readAsString();
-        developer.log('LOCAL BACKUP: Found existing backup (${content.length} chars)', name: 'GAUwallet');
+        developer.log('DEBUG: LOCAL BACKUP - Found existing backup (${content.length} chars)', name: 'GAUwallet');
         return content;
       }
 
-      developer.log('LOCAL BACKUP: No existing backup found in ${directory.path}', name: 'GAUwallet');
+      developer.log('DEBUG: LOCAL BACKUP - No existing backup found at: $backupPath', name: 'GAUwallet');
       return null;
     } catch (e, stackTrace) {
-      developer.log('LOCAL BACKUP ERROR: Failed to read backup file', error: e, stackTrace: stackTrace, name: 'GAUwallet');
+      developer.log('DEBUG: LOCAL BACKUP ERROR: Failed to read backup file', error: e, stackTrace: stackTrace, name: 'GAUwallet');
       rethrow;
     }
   }
