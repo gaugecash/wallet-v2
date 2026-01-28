@@ -112,12 +112,12 @@ class CurrencyScreen extends HookConsumerWidget {
                     Text(
                       wideScreen ? 'Transactions' : 'TXs',
                       style: GTextStyles.h1
-                          .copyWith(color: GColors.white.withOpacity(0.4)),
+                          .copyWith(color: GColors.white.withValues(alpha: 0.4)),
                     ),
                     const SizedBox(width: 8),
                     Icon(
                       LucideIcons.externalLink,
-                      color: GColors.white.withOpacity(0.4),
+                      color: GColors.white.withValues(alpha: 0.4),
                     ),
                   ],
                 ),

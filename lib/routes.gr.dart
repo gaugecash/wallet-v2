@@ -213,10 +213,18 @@ class ReceiveRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [SendScreen]
-class SendRoute extends PageRouteInfo<void> {
-  const SendRoute({List<PageRouteInfo>? children})
-      : super(
+class SendRoute extends PageRouteInfo<SendRouteArgs> {
+  SendRoute({
+    Key? key,
+    String? preselectedTicker,
+    List<PageRouteInfo>? children,
+  }) : super(
           SendRoute.name,
+          args: SendRouteArgs(
+            key: key,
+            preselectedTicker: preselectedTicker,
+          ),
+          rawQueryParams: {'ticker': preselectedTicker},
           initialChildren: children,
         );
 
@@ -225,7 +233,49 @@ class SendRoute extends PageRouteInfo<void> {
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const SendScreen();
+      final queryParams = data.queryParams;
+      final args = data.argsAs<SendRouteArgs>(
+          orElse: () => SendRouteArgs(
+              preselectedTicker: queryParams.optString('ticker')));
+      return SendScreen(
+        key: args.key,
+        preselectedTicker: args.preselectedTicker,
+      );
+    },
+  );
+}
+
+class SendRouteArgs {
+  const SendRouteArgs({
+    this.key,
+    this.preselectedTicker,
+  });
+
+  final Key? key;
+
+  final String? preselectedTicker;
+
+  @override
+  String toString() {
+    return 'SendRouteArgs{key: $key, preselectedTicker: $preselectedTicker}';
+  }
+}
+
+/// generated route for
+/// [SendTokenSelectScreen]
+class SendTokenSelectRoute extends PageRouteInfo<void> {
+  const SendTokenSelectRoute({List<PageRouteInfo>? children})
+      : super(
+          SendTokenSelectRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'SendTokenSelectRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const SendTokenSelectScreen();
     },
   );
 }

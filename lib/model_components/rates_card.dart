@@ -22,7 +22,7 @@ class RatesCard extends ConsumerWidget {
           (states) {
             var radius = 18.0;
             final border = BorderSide(
-              color: GColors.white.withOpacity(0.9),
+              color: GColors.white.withValues(alpha: 0.9),
               width: 2,
             );
             final active = <MaterialState>[

@@ -44,17 +44,17 @@ class BalanceCompactCard extends GButtonBase {
   }
 
   @override
-  Color get backgroundColor => noBorder ? Colors.transparent : GColors.cardBackground.withOpacity(0.8);
+  Color get backgroundColor => noBorder ? Colors.transparent : GColors.cardBackground.withValues(alpha: 0.8);
 
   @override
   BorderSide get border => BorderSide(
-        color: noBorder? Colors.transparent : GColors.white.withOpacity(highlighted ? 0.5 : 0.4),
+        color: noBorder? Colors.transparent : GColors.white.withValues(alpha: highlighted ? 0.5 : 0.4),
         width: 2,
       );
 
   @override
   BorderSide get focusedBorder => BorderSide(
-        color: noBorder ? Colors.transparent : GColors.white.withOpacity(0.6),
+        color: noBorder ? Colors.transparent : GColors.white.withValues(alpha: 0.6),
         width: 2.8,
       );
 
@@ -74,7 +74,7 @@ class BalanceCompactCard extends GButtonBase {
   //             style: GTextStyles.mulishLight.copyWith(
   //               fontWeight: FontWeight.w400,
   //               fontSize: 12,
-  //               color: GColors.white.withOpacity(0.88),
+  //               color: GColors.white.withValues(alpha: 0.88),
   //             ),
   //           ),
   //         ),

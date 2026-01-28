@@ -7,10 +7,10 @@ class SuccessAlertComponent extends AlertComponent {
   const SuccessAlertComponent({required super.text, super.key});
 
   @override
-  Color get bgColor => GColors.greenSuccess.withOpacity(0.1);
+  Color get bgColor => GColors.greenSuccess.withValues(alpha: 0.1);
 
   @override
-  Color get borderColor => GColors.greenSuccessBorder.withOpacity(0.4);
+  Color get borderColor => GColors.greenSuccessBorder.withValues(alpha: 0.4);
 
   @override
   Color get textColor => GColors.white;

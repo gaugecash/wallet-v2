@@ -42,7 +42,7 @@ class ReceiveCurrencyTab extends HookConsumerWidget {
                   height: 48,
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: GColors.white.withOpacity(0.6),
+                      color: GColors.white.withValues(alpha: 0.6),
                       width: 2,
                     ),
                     borderRadius: BorderRadius.circular(16),
@@ -107,7 +107,7 @@ class ReceiveCurrencyTab extends HookConsumerWidget {
               'This address receives GAU, USDT, and POL',
               style: TextStyle(
                 fontSize: 14,
-                color: GColors.white.withOpacity(0.7),
+                color: GColors.white.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),

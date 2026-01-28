@@ -1,6 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:wallet/components/slivers/spacing.dart';
+import 'package:wallet/conf.dart';
 import 'package:wallet/layouts/app_layout_sliver.dart';
 import 'package:wallet/models/currency.dart';
 import 'package:wallet/providers/wallet.dart';
@@ -14,15 +16,15 @@ class SendTokenSelectScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final wallet = ref.read(walletProvider);
 
-    // Filter currencies: GAU, USDT always show; POL only if balance > 0.000001
+    // Filter currencies: GAU, USDT always show; POL only if balance > threshold
     final availableTokens = wallet.currencies!.where((currency) {
       if (currency.type == CurrencyTicker.gau || currency.type == CurrencyTicker.usdt) {
         return true;
       }
       if (currency.type == CurrencyTicker.matic) {
-        // Show POL only if balance > 0.000001
+        // Show POL only if balance > threshold
         final balance = currency.balance.lastValue;
-        return balance != null && balance > 0.000001;
+        return balance != null && balance > polVisibilityThreshold;
       }
       return false;
     }).toList();
@@ -61,10 +63,10 @@ class SendTokenSelectScreen extends HookConsumerWidget {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: GColors.backgroundCard,
+                        color: GColors.backgroundScaffold.withValues(alpha: 0.8),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: GColors.white.withOpacity(0.1),
+                          color: GColors.white.withValues(alpha: 0.1),
                           width: 1,
                         ),
                       ),
@@ -87,7 +89,7 @@ class SendTokenSelectScreen extends HookConsumerWidget {
                               Text(
                                 currency.type.name,
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.6),
+                                  color: Colors.white.withValues(alpha: 0.6),
                                   fontSize: 14,
                                 ),
                               ),
@@ -95,7 +97,7 @@ class SendTokenSelectScreen extends HookConsumerWidget {
                           ),
                           Icon(
                             Icons.arrow_forward_ios,
-                            color: Colors.white.withOpacity(0.4),
+                            color: Colors.white.withValues(alpha: 0.4),
                             size: 16,
                           ),
                         ],

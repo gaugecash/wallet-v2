@@ -32,7 +32,7 @@ class GPrimaryInput extends HookWidget {
   InputBorder get _getBorder => OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide(
-          color: GColors.white.withOpacity(disabled ? 0.4 : 0.6),
+          color: GColors.white.withValues(alpha: disabled ? 0.4 : 0.6),
           width: 2,
         ),
       );
@@ -75,7 +75,7 @@ class GPrimaryInput extends HookWidget {
         disabledBorder: _getBorder,
         labelText: label,
         labelStyle: GTextStyles.poppinsMediumButton.copyWith(
-          color: disabled ? GColors.white.withOpacity(0.6) : GColors.white,
+          color: disabled ? GColors.white.withValues(alpha: 0.6) : GColors.white,
         ),
         suffixIcon: suffix,
       ),

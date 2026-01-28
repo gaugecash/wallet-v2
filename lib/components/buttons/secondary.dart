@@ -34,14 +34,14 @@ class GSecondaryButton extends GButtonBase {
   @override
   BorderSide get border => BorderSide(
         color:
-            onPressed != null ? GColors.white : GColors.white.withOpacity(0.2),
+            onPressed != null ? GColors.white : GColors.white.withValues(alpha: 0.2),
         width: 2,
       );
 
   @override
   BorderSide get focusedBorder => BorderSide(
         color:
-            onPressed != null ? GColors.white : GColors.white.withOpacity(0.2),
+            onPressed != null ? GColors.white : GColors.white.withValues(alpha: 0.2),
         width: 2.8,
       );
 

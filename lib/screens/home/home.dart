@@ -93,7 +93,7 @@ class HomeScreen extends HookConsumerWidget {
                 labelStyle: GTextStyles.h1,
                 isScrollable: true,
                 labelPadding: const EdgeInsets.symmetric(horizontal: 5),
-                unselectedLabelColor: GColors.white.withOpacity(0.4),
+                unselectedLabelColor: GColors.white.withValues(alpha: 0.4),
                 splashBorderRadius: BorderRadius.circular(12),
                 splashFactory: NoSplash.splashFactory,
                 tabs: [

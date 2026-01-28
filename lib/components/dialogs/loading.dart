@@ -5,12 +5,12 @@ import 'package:wallet/styling.dart';
 void showLoadingDialog(BuildContext context) {
   showDialog(
     barrierDismissible: false,
-    barrierColor: Colors.black.withOpacity(0.6),
+    barrierColor: Colors.black.withValues(alpha: 0.6),
     context: context,
     builder: (BuildContext context) {
       return GenericDialog(
-        backgroundColor: GColors.white.withOpacity(0.2),
-        borderColor: GColors.white.withOpacity(0.8),
+        backgroundColor: GColors.white.withValues(alpha: 0.2),
+        borderColor: GColors.white.withValues(alpha: 0.8),
         autoDismiss: null,
         dismissible: false,
         child: const SizedBox(

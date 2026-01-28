@@ -32,13 +32,13 @@ class GIconButton extends GButtonBase {
 
   @override
   BorderSide get border => BorderSide(
-        color: GColors.white.withOpacity(0.6),
+        color: GColors.white.withValues(alpha: 0.6),
         width: 2,
       );
 
   @override
   BorderSide get focusedBorder => BorderSide(
-        color: GColors.white.withOpacity(0.8),
+        color: GColors.white.withValues(alpha: 0.8),
         width: 2.8,
       );
 }

@@ -67,7 +67,7 @@ class _BackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = GColors.backgroundScaffoldAccent.withOpacity(0.12)
+      ..color = GColors.backgroundScaffoldAccent.withValues(alpha: 0.12)
       ..style = PaintingStyle.fill
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 70);
 

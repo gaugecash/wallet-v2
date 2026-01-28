@@ -5,12 +5,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:wallet/components/help_cards/gau_card.dart';
 import 'package:wallet/components/slivers/spacing.dart';
+import 'package:wallet/conf.dart';
 import 'package:wallet/model_components/balance_card.dart';
 import 'package:wallet/model_components/rates_card.dart';
 import 'package:wallet/model_components/wallet_action.dart';
 import 'package:wallet/models/currency.dart';
 import 'package:wallet/providers/wallet.dart';
-import 'package:wallet/styling.dart';
 
 class HomePageDefaultFragment extends HookConsumerWidget {
   const HomePageDefaultFragment({super.key});
@@ -26,7 +26,7 @@ class HomePageDefaultFragment extends HookConsumerWidget {
       slivers: [
         for (final currency in wallet.currencies!.where(
           (element) => !element.investOnly && !element.exchangeOnly &&
-            (element.type != CurrencyTicker.matic || (element.balance.lastValue ?? 0) > 0.000001),
+            (element.type != CurrencyTicker.matic || (element.balance.lastValue ?? 0) > polVisibilityThreshold),
         )) ...[
           GPaddingsLayoutHorizontal.sliver(
             child: Hero(
@@ -54,7 +54,7 @@ class HomePageDefaultFragment extends HookConsumerWidget {
           //       margin: const EdgeInsets.symmetric(horizontal: 12),
           //       decoration: BoxDecoration(
           //         borderRadius: BorderRadius.circular(2),
-          //         color: GColors.white.withOpacity(0.2),
+          //         color: GColors.white.withValues(alpha: 0.2),
           //       ),
           //     ),
           //   ),
@@ -77,77 +77,8 @@ class HomePageDefaultFragment extends HookConsumerWidget {
                   label: 'Send',
                   icon: LucideIcons.send,
                   onPressed: () {
-                    // Show bottom sheet with token selection
-                    final sendableCurrencies = wallet.currencies!
-                        .where((c) =>
-                          !c.investOnly &&
-                          !c.exchangeOnly &&
-                          (c.type == CurrencyTicker.gau ||
-                           c.type == CurrencyTicker.usdt ||
-                           c.type == CurrencyTicker.matic) &&
-                          (c.balance.lastValue ?? 0) > 0.000001)
-                        .toList();
-
-                    showModalBottomSheet(
-                      context: context,
-                      backgroundColor: GColors.backgroundScaffold,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                      ),
-                      builder: (context) {
-                        return SafeArea(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Container(
-                                  width: 40,
-                                  height: 4,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.3),
-                                    borderRadius: BorderRadius.circular(2),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                                child: Text(
-                                  'Select Token',
-                                  style: GTextStyles.h2,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              ...sendableCurrencies.map((currency) {
-                                return ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                                  title: Text(
-                                    currency.type.ticker.toUpperCase(),
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    currency.type.name,
-                                    style: TextStyle(
-                                      color: Colors.white.withOpacity(0.6),
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                    context.router.pushNamed('/send?ticker=${currency.type.ticker}');
-                                  },
-                                );
-                              }).toList(),
-                              const SizedBox(height: 16),
-                            ],
-                          ),
-                        );
-                      },
-                    );
+                    // Navigate to full-screen token selector
+                    context.router.pushNamed('/send-token-select');
                   },
                 ),
               ),

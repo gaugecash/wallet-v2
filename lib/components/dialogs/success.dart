@@ -10,12 +10,12 @@ void showSuccessDialog(
 }) {
   showDialog(
     barrierDismissible: true,
-    barrierColor: Colors.black.withOpacity(0.6),
+    barrierColor: Colors.black.withValues(alpha: 0.6),
     context: context,
     builder: (BuildContext context) {
       return GenericDialog(
-        backgroundColor: GColors.greenSuccess.withOpacity(0.2),
-        borderColor: GColors.greenSuccessBorder.withOpacity(0.8),
+        backgroundColor: GColors.greenSuccess.withValues(alpha: 0.2),
+        borderColor: GColors.greenSuccessBorder.withValues(alpha: 0.8),
         autoDismiss: autoDismiss ? const Duration(milliseconds: 800) : null,
         dismissible: true,
         child: message == null

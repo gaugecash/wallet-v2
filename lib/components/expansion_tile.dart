@@ -215,7 +215,7 @@ class ConfigurableExpansionTileState extends State<ConfigurableExpansionTile>
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Material(
-            color: GColors.blackBlueish.withOpacity(0.6),
+            color: GColors.blackBlueish.withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(8),
             child: InkWell(
               onTap: _handleTap,

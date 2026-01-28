@@ -126,10 +126,10 @@ class SettingsScreen extends HookConsumerWidget {
           GPaddingsLayoutHorizontal.sliver(
             child: SwitchListTile(
               visualDensity: const VisualDensity(vertical: 1.5),
-              tileColor: GColors.blackBlueish.withOpacity(0.4),
+              tileColor: GColors.blackBlueish.withValues(alpha: 0.4),
               shape: RoundedRectangleBorder(
                 side: BorderSide(
-                  color: GColors.white.withOpacity(0.4),
+                  color: GColors.white.withValues(alpha: 0.4),
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(16),
@@ -139,12 +139,12 @@ class SettingsScreen extends HookConsumerWidget {
                 style: GTextStyles.poppinsMediumButton.copyWith(
                   color: enableExchange == 'true'
                       ? GColors.white
-                      : GColors.white.withOpacity(0.9),
+                      : GColors.white.withValues(alpha: 0.9),
                 ),
               ),
               value: enableExchange == 'true',
               activeColor: GColors.white,
-              // inactiveThumbColor: GColors.white.withOpacity(0.4),
+              // inactiveThumbColor: GColors.white.withValues(alpha: 0.4),
               onChanged: (bool? value) async {
                 await Hive.box<String>(safeBox).put(
                   'enable_exchange',
@@ -163,10 +163,10 @@ class SettingsScreen extends HookConsumerWidget {
         GPaddingsLayoutHorizontal.sliver(
           child: SwitchListTile(
             visualDensity: const VisualDensity(vertical: 1.5),
-            tileColor: GColors.blackBlueish.withOpacity(0.4),
+            tileColor: GColors.blackBlueish.withValues(alpha: 0.4),
             shape: RoundedRectangleBorder(
               side: BorderSide(
-                color: GColors.white.withOpacity(0.4),
+                color: GColors.white.withValues(alpha: 0.4),
                 width: 2,
               ),
               borderRadius: BorderRadius.circular(16),
@@ -176,12 +176,12 @@ class SettingsScreen extends HookConsumerWidget {
               style: GTextStyles.poppinsMediumButton.copyWith(
                 color: investorMode != 'false'
                     ? GColors.white
-                    : GColors.white.withOpacity(0.9),
+                    : GColors.white.withValues(alpha: 0.9),
               ),
             ),
             value: investorMode != 'false',
             activeColor: GColors.white,
-            // inactiveThumbColor: GColors.white.withOpacity(0.4),
+            // inactiveThumbColor: GColors.white.withValues(alpha: 0.4),
             onChanged: (bool? value) async {
               await Hive.box<String>(safeBox).put(
                 'investor_mode',
@@ -213,7 +213,7 @@ class SettingsScreen extends HookConsumerWidget {
             child: Text(
               'This creates an encrypted file you can save anywhere. Your password protects it.',
               style: TextStyle(
-                color: GColors.white.withOpacity(0.7),
+                color: GColors.white.withValues(alpha: 0.7),
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,
@@ -348,7 +348,7 @@ class SettingsScreen extends HookConsumerWidget {
               child: Text(
                 'GAU wallet v$version+$versionCode (${gitCode.data ?? ''})',
                 style: GTextStyles.mulishVersionText.copyWith(
-                  color: GColors.white.withOpacity(0.8),
+                  color: GColors.white.withValues(alpha: 0.8),
                 ),
               ),
             ),
@@ -364,7 +364,7 @@ class SettingsScreen extends HookConsumerWidget {
         //       child: Text(
         //         '(c) gaugecash.com',
         //         style: GTextStyles.mulishVersionText.copyWith(
-        //           color: GColors.white.withOpacity(0.8),
+        //           color: GColors.white.withValues(alpha: 0.8),
         //         ),
         //       ),
         //     ),

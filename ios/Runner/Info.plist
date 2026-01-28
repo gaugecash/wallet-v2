@@ -74,8 +74,6 @@
 		<false/>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
-		<key>ITSAppUsesNonExemptEncryption</key>
-		<false/>
 	<key>NSUbiquitousContainers</key>
 	<dict>
 		<key>iCloud.$(CFBundleIdentifier)</key>

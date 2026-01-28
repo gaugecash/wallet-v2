@@ -7,10 +7,10 @@ class InfoAlertComponent extends AlertComponent {
   const InfoAlertComponent({required super.text, super.key});
 
   @override
-  Color get bgColor => GColors.white.withOpacity(0.2);
+  Color get bgColor => GColors.white.withValues(alpha: 0.2);
 
   @override
-  Color get borderColor => GColors.white.withOpacity(0.6);
+  Color get borderColor => GColors.white.withValues(alpha: 0.6);
 
   @override
   Color get textColor => GColors.white;

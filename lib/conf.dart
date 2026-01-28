@@ -123,9 +123,9 @@ enum Network {
   main,
 }
 
-// DO NOT CHANGE THIS VALUE. IT WILL LITERALLY BREAK THE APP.
-const encryptionSalt = 'RbRiYJBS2MWk5xNIFJrfRBZEqiI/RUE94Euj6cLWO5U=';
-
 const safeBox = 'safe';
 
 const int breakPointWidth = 700;
+
+const double polVisibilityThreshold = 0.000001;
+const double gaslessBalanceThreshold = 0.05;

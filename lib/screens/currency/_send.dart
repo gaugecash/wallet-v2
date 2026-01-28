@@ -6,6 +6,7 @@ import 'package:wallet/components/dialogs/calculator.dart';
 import 'package:wallet/components/dialogs/tx.dart';
 import 'package:wallet/components/inputs/primary.dart';
 import 'package:wallet/components/slivers/spacing.dart';
+import 'package:wallet/conf.dart';
 import 'package:wallet/models/currency.dart';
 import 'package:wallet/models/tx.dart';
 import 'package:wallet/screens/_generic/scan_qr.dart';
@@ -25,7 +26,7 @@ class SendCurrencyTab extends HookWidget {
     final amount = useTextEditingController();
 
     // Smart gasless auto-detection based on POL balance
-    final shouldUseGasless = (maticBalance ?? 0) < 0.05;
+    final shouldUseGasless = (maticBalance ?? 0) < gaslessBalanceThreshold;
 
     final amountWidget = currency.type == CurrencyTicker.gau
         ? GPrimaryInput(
@@ -99,7 +100,7 @@ class SendCurrencyTab extends HookWidget {
                     ? 'Gas fee: Covered by Relayer'
                     : 'Gas fee: ~${(maticBalance ?? 0) * 0.0001} POL',
                 style: TextStyle(
-                  color: GColors.white.withOpacity(0.7),
+                  color: GColors.white.withValues(alpha: 0.7),
                   fontSize: 14,
                 ),
                 textAlign: TextAlign.center,

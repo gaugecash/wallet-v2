@@ -7,10 +7,10 @@ class WarningAlertComponent extends AlertComponent {
   const WarningAlertComponent({required super.text, super.key});
 
   @override
-  Color get bgColor => GColors.redWarning.withOpacity(0.8);
+  Color get bgColor => GColors.redWarning.withValues(alpha: 0.8);
 
   @override
-  Color get borderColor => GColors.redWarningBorder.withOpacity(0.9);
+  Color get borderColor => GColors.redWarningBorder.withValues(alpha: 0.9);
 
   @override
   Color get textColor => GColors.white;

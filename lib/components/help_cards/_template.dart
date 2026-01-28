@@ -43,9 +43,9 @@ class LearnMoreTemplate extends HookWidget {
             borderRadius: BorderRadius.circular(14),
             gradient: LinearGradient(
               colors: [
-                GColors.cardBackground.withOpacity(1),
-                GColors.backgroundScaffoldAccent.withOpacity(0.5),
-                GColors.backgroundScaffoldAccent.withOpacity(1)
+                GColors.cardBackground.withValues(alpha: 1),
+                GColors.backgroundScaffoldAccent.withValues(alpha: 0.5),
+                GColors.backgroundScaffoldAccent.withValues(alpha: 1)
               ],
             ),
           ),

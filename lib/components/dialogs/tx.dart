@@ -33,16 +33,16 @@ class TxDialog extends HookWidget {
 
     switch (status) {
       case TxStatus.sending:
-        color = GColors.white.withOpacity(0.2);
-        borderColor = GColors.white.withOpacity(0.8);
+        color = GColors.white.withValues(alpha: 0.2);
+        borderColor = GColors.white.withValues(alpha: 0.8);
         break;
       case TxStatus.error:
-        color = GColors.redWarning.withOpacity(0.2);
-        borderColor = GColors.redWarningBorder.withOpacity(0.8);
+        color = GColors.redWarning.withValues(alpha: 0.2);
+        borderColor = GColors.redWarningBorder.withValues(alpha: 0.8);
         break;
       case TxStatus.sent:
-        color = GColors.greenSuccess.withOpacity(0.2);
-        borderColor = GColors.greenSuccessBorder.withOpacity(0.8);
+        color = GColors.greenSuccess.withValues(alpha: 0.2);
+        borderColor = GColors.greenSuccessBorder.withValues(alpha: 0.8);
         break;
     }
 

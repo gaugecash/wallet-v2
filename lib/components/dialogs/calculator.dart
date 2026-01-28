@@ -14,7 +14,7 @@ import 'package:wallet/styling.dart';
 Future<double?> showCalculatorDialog(BuildContext context, double gau) {
   return showDialog<double>(
     barrierDismissible: false,
-    barrierColor: Colors.black.withOpacity(0.6),
+    barrierColor: Colors.black.withValues(alpha: 0.6),
     context: context,
     builder: (BuildContext context) {
       return Center(
@@ -66,9 +66,9 @@ class _CalculatorDialog extends HookConsumerWidget {
       width: 320,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: GColors.white.withOpacity(0.1),
+        color: GColors.white.withValues(alpha: 0.1),
         border: Border.all(
-          color: GColors.white.withOpacity(0.8),
+          color: GColors.white.withValues(alpha: 0.8),
           width: 2,
         ),
       ),

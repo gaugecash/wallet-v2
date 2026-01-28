@@ -284,7 +284,7 @@ class _ExchangeCoin extends HookConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: GColors.white.withOpacity(0.2),
+                      color: GColors.white.withValues(alpha: 0.2),
                       width: 2,
                     ),
                     borderRadius: BorderRadius.circular(16),
@@ -343,7 +343,7 @@ class _ExchangeCoin extends HookConsumerWidget {
                 borderRadius: BorderRadius.circular(16),
                 color: GColors.backgroundScaffold,
                 border: Border.all(
-                  color: GColors.white.withOpacity(0.2),
+                  color: GColors.white.withValues(alpha: 0.2),
                   width: 2,
                 ),
               ),

@@ -32,17 +32,17 @@ class BalanceSwapCard extends GButtonBase {
   final IconData swapStateIcon;
 
   @override
-  Color get backgroundColor => GColors.cardBackground.withOpacity(0.8);
+  Color get backgroundColor => GColors.cardBackground.withValues(alpha: 0.8);
 
   @override
   BorderSide get border => BorderSide(
-        color: GColors.white.withOpacity(0.4),
+        color: GColors.white.withValues(alpha: 0.4),
         width: 2,
       );
 
   @override
   BorderSide get focusedBorder => BorderSide(
-        color: GColors.white.withOpacity(0.6),
+        color: GColors.white.withValues(alpha: 0.6),
         width: 2.8,
       );
 

@@ -21,7 +21,7 @@ abstract class GButtonBase extends StatelessWidget {
   Widget body(BuildContext context);
 
   Color get backgroundColor =>
-      onPressed != null ? GColors.white : GColors.white.withOpacity(0.6);
+      onPressed != null ? GColors.white : GColors.white.withValues(alpha: 0.6);
 
   BorderSide get border => BorderSide.none;
 

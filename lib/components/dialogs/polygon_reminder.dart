@@ -11,12 +11,12 @@ import 'package:wallet/styling.dart';
 void showPolygonReminderDialog(BuildContext context) {
   showDialog(
     barrierDismissible: true,
-    barrierColor: Colors.black.withOpacity(0.6),
+    barrierColor: Colors.black.withValues(alpha: 0.6),
     context: context,
     builder: (BuildContext context) {
       return GenericDialog(
-        backgroundColor: GColors.redWarning.withOpacity(0.2),
-        borderColor: GColors.redWarningBorder.withOpacity(0.8),
+        backgroundColor: GColors.redWarning.withValues(alpha: 0.2),
+        borderColor: GColors.redWarningBorder.withValues(alpha: 0.8),
         autoDismiss: null,
         dismissible: false,
         child: const _PolygonReminderDialog(),

@@ -24,7 +24,7 @@ class DPageIndicator extends StatelessWidget {
             radius: 6,
             dotWidth: width,
             dotHeight: 10,
-            dotColor: GColors.white.withOpacity(0.4),
+            dotColor: GColors.white.withValues(alpha: 0.4),
             activeDotColor: GColors.white,
           ),
         );

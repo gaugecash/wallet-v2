@@ -99,7 +99,7 @@ class SetUpPinCodeAuth extends HookConsumerWidget {
               decoration: BoxDecoration(
                 color: Colors.transparent,
                 border: Border.all(
-                  color: GColors.white.withOpacity(0.4),
+                  color: GColors.white.withValues(alpha: 0.4),
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
