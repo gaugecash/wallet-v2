@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -167,7 +167,9 @@ class WalletBackup {
       showMessage('Saving to local storage...');
       await _saveToLocalStorage(encrypted);
 
-      if (Platform.isIOS) {
+      if (kIsWeb) {
+        showMessage('✓ Backup encrypted. Download the backup file to save it.');
+      } else if (Platform.isIOS) {
         showMessage('✓ Backup saved (auto-backed up by iCloud Backup)');
       } else if (Platform.isAndroid) {
         showMessage('✓ Backup saved (auto-backed up by Google Auto Backup)');
@@ -184,8 +186,16 @@ class WalletBackup {
   /// Saves encrypted backup to local storage
   /// iOS: Application Support directory (hidden from user, auto-backed up by iCloud Backup)
   /// Android: Application Documents directory (auto-backed up by Google Auto Backup)
+  /// Web: Skip auto-save (user downloads .txt file manually via share button)
   Future<void> _saveToLocalStorage(String encryptedBackup) async {
     try {
+      // Web: Skip local storage save (no persistent file system)
+      // User will download backup manually via share button
+      if (kIsWeb) {
+        developer.log('DEBUG: LOCAL BACKUP - Web platform detected, skipping auto-save', name: 'GAUwallet');
+        return;
+      }
+
       // Get platform-specific directory
       final Directory directory;
       if (Platform.isIOS) {
@@ -246,8 +256,15 @@ class WalletBackup {
   /// Checks for backup in local storage
   /// iOS: Application Support directory
   /// Android: Application Documents directory
+  /// Web: No auto-saved backup (user downloads manually)
   static Future<String?> _checkLocalBackup() async {
     try {
+      // Web: No local file storage, return null
+      if (kIsWeb) {
+        developer.log('DEBUG: LOCAL BACKUP - Web platform detected, no auto-saved backup available', name: 'GAUwallet');
+        return null;
+      }
+
       // Get platform-specific directory
       final Directory directory;
       if (Platform.isIOS) {
