@@ -169,9 +169,9 @@ class WalletBackup {
 
       if (kIsWeb) {
         showMessage('✓ Backup encrypted. Download the backup file to save it.');
-      } else if (Platform.isIOS) {
+      } else if (!kIsWeb && Platform.isIOS) {
         showMessage('✓ Backup saved (auto-backed up by iCloud Backup)');
-      } else if (Platform.isAndroid) {
+      } else if (!kIsWeb && Platform.isAndroid) {
         showMessage('✓ Backup saved (auto-backed up by Google Auto Backup)');
       }
     } catch (e, stackTrace) {
@@ -198,7 +198,7 @@ class WalletBackup {
 
       // Get platform-specific directory
       final Directory directory;
-      if (Platform.isIOS) {
+      if (!kIsWeb && Platform.isIOS) {
         // iOS: Use Application Support directory (hidden from user, auto-backed up)
         directory = await getApplicationSupportDirectory();
       } else {
@@ -267,7 +267,7 @@ class WalletBackup {
 
       // Get platform-specific directory
       final Directory directory;
-      if (Platform.isIOS) {
+      if (!kIsWeb && Platform.isIOS) {
         directory = await getApplicationSupportDirectory();
       } else {
         directory = await getApplicationDocumentsDirectory();

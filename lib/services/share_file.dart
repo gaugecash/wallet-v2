@@ -13,22 +13,22 @@ Future<void> shareFile(String contents, BuildContext context) {
     return Future.value();
   }
 
-  if (Platform.isAndroid || Platform.isIOS) {
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
     return _shareFileMobile(contents, context);
   }
 
-  if (Platform.isLinux) {
+  if (!kIsWeb && Platform.isLinux) {
     return Future.value();
   }
 
-  throw UnimplementedError('Unknown platform: ${Platform.operatingSystem}');
+  throw UnimplementedError('Unknown platform: ${kIsWeb ? "Web" : Platform.operatingSystem}');
 }
 
 void _shareFileWeb(String contents) {
   final codes = utf8.encode(contents);
   final content = base64Encode(codes);
   html.AnchorElement(
-    href: 'data:application/octet-stream;charset=utf-16le;base64,$content',
+    href: 'data:application/octet-stream;charset=utf-8;base64,$content',
   )
     ..setAttribute('download', 'gau_key.txt')
     ..click();

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 
 import 'package:auto_route/auto_route.dart';
+import 'package:cryptography_flutter/cryptography_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -70,7 +71,7 @@ class SplashScreen extends HookConsumerWidget {
     logger.i('INIT');
     // so that the UI can build
     await Future.delayed(Duration.zero);
-    // FlutterCryptography.enable();
+    FlutterCryptography.enable();
 
     await _initStorage();
 
