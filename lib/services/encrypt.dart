@@ -117,7 +117,8 @@ Future<String> _gDecryptLegacy(String password, String encryptedPayload) async {
   final salt = base64.decode(legacySalt);
 
   // Derive key using legacy hardcoded salt
-  final secret = await _pass2key(password, salt);
+  // For legacy on Web, also force pure Dart PBKDF2
+  final secret = await _pass2key(password, salt, useDart: kIsWeb);
 
   // In legacy format, IV/nonce was same as salt (32 bytes)
   final nonce = salt;
@@ -139,12 +140,18 @@ Future<String> _gDecryptLegacy(String password, String encryptedPayload) async {
 
 
 /// Derives encryption key from password using PBKDF2
-Future<SecretKey> _pass2key(String password, List<int> salt) async {
-  final pbkdf2 = Pbkdf2(
-    macAlgorithm: Hmac.sha256(),
-    iterations: 100000,
-    bits: 256,
-  );
+Future<SecretKey> _pass2key(String password, List<int> salt, {bool useDart = false}) async {
+  final pbkdf2 = (kIsWeb && useDart)
+      ? DartPbkdf2(
+          macAlgorithm: Hmac.sha256(),
+          iterations: 100000,
+          bits: 256,
+        )
+      : Pbkdf2(
+          macAlgorithm: Hmac.sha256(),
+          iterations: 100000,
+          bits: 256,
+        );
 
   final passwordBytes = utf8.encode(password);
   final secretKey = SecretKey(passwordBytes);

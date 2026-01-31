@@ -49,8 +49,9 @@ class SetUpRestore1PasswordStep extends SetUpStep {
           backup.autoSave(provider.password!, context: _currentContext);
 
           return true;
-        } catch (e) {
-          logger.e(e);
+        } catch (e, stackTrace) {
+          logger.e('DECRYPT ERROR: $e');
+          logger.e('STACK TRACE: $stackTrace');
           return false;
         }
       };
