@@ -166,9 +166,27 @@ Future<String> _gDecryptLegacyPointyCastle(String password, String encryptedPayl
     // STEP 7: Convert to string
     developer.log('[PC] STEP 7: Converting bytes to UTF-8 string', name: 'PointyCastle');
 
-    // Force type to Uint8List to avoid JS type issues
-    final decryptedBytes = decrypted is Uint8List ? decrypted : Uint8List.fromList(decrypted);
-    developer.log('[PC] STEP 7a: Converted to Uint8List, length = ${decryptedBytes.length}', name: 'PointyCastle');
+    // CRITICAL: In JavaScript/release mode, cipher.process() returns a JS array
+    // that needs special handling for type conversion
+    Uint8List decryptedBytes;
+    if (decrypted is Uint8List) {
+      decryptedBytes = decrypted;
+      developer.log('[PC] STEP 7a: Already Uint8List', name: 'PointyCastle');
+    } else if (decrypted is List<int>) {
+      decryptedBytes = Uint8List.fromList(decrypted);
+      developer.log('[PC] STEP 7a: Converted from List<int>', name: 'PointyCastle');
+    } else {
+      // JavaScript array - manually convert each element
+      developer.log('[PC] STEP 7a: JS array detected, manual conversion. Type: ${decrypted.runtimeType}', name: 'PointyCastle');
+      final length = (decrypted as dynamic).length as int;
+      decryptedBytes = Uint8List(length);
+      for (var i = 0; i < length; i++) {
+        decryptedBytes[i] = (decrypted as dynamic)[i] as int;
+      }
+      developer.log('[PC] STEP 7b: Manual conversion complete', name: 'PointyCastle');
+    }
+
+    developer.log('[PC] STEP 7c: Final bytes length = ${decryptedBytes.length}', name: 'PointyCastle');
 
     final result = utf8.decode(decryptedBytes);
     developer.log('[PC] STEP 7 ✅: string length = ${result.length}', name: 'PointyCastle');
