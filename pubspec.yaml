@@ -1,7 +1,7 @@
 name: wallet
 description: GAU wallet
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
-version: 1.0.8+170
+version: 1.0.8+171
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -83,6 +83,7 @@ dependencies:
   convert: ^3.1.1
   cryptography: ^2.5.0
   cryptography_flutter: ^2.3.4
+  pointycastle: ^3.9.1
 
   # STORAGE
   hive: ^2.2.3

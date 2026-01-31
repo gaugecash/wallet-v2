@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cryptography/cryptography.dart';
 import 'package:cryptography/dart.dart';
 import 'package:flutter/foundation.dart';
+import 'package:pointycastle/export.dart' as pc;
 
 // i guess there is no need to use a JsWorker on the web
 // since encryption library already calls native apis
@@ -102,23 +103,60 @@ Future<String> _gDecryptNew(String password, String encryptedPayload) async {
   return utf8.decode(result);
 }
 
+/// Decrypts LEGACY format using PointyCastle (pure Dart, works on web with 32-byte nonce)
+Future<String> _gDecryptLegacyPointyCastle(String password, String encryptedPayload) async {
+  // Legacy salt (also used as nonce)
+  const legacySalt = 'RbRiYJBS2MWk5xNIFJrfRBZEqiI/RUE94Euj6cLWO5U=';
+  final salt = base64.decode(legacySalt);
+
+  // Parse 2-part format
+  final parts = encryptedPayload.split('.');
+  final cipherText = base64.decode(parts[0]);
+  final mac = base64.decode(parts[1]);
+
+  // Derive key using PBKDF2 (PointyCastle)
+  final pbkdf2 = pc.PBKDF2KeyDerivator(pc.HMac(pc.SHA256Digest(), 64))
+    ..init(pc.Pbkdf2Parameters(salt, 100000, 32));
+  final key = pbkdf2.process(utf8.encode(password));
+
+  // Decrypt using AES-GCM (PointyCastle)
+  final cipher = pc.GCMBlockCipher(pc.AESEngine())
+    ..init(
+      false, // decrypt
+      pc.AEADParameters(
+        pc.KeyParameter(key),
+        128, // tag length in bits (16 bytes)
+        salt, // 32-byte nonce - PointyCastle accepts ANY size
+        Uint8List(0), // no AAD
+      ),
+    );
+
+  // Combine ciphertext + mac for GCM
+  final combined = Uint8List(cipherText.length + mac.length);
+  combined.setAll(0, cipherText);
+  combined.setAll(cipherText.length, mac);
+
+  final decrypted = cipher.process(combined);
+  return utf8.decode(decrypted);
+}
+
 /// Decrypts LEGACY format: ENCRYPTED_DATA.MAC (2 parts, with hardcoded salt)
 /// This is for backward compatibility with backups created before Phase 1 Security update
 Future<String> _gDecryptLegacy(String password, String encryptedPayload) async {
-  // Legacy format used a 32-byte salt as the Nonce (IV).
-  // On Web, the native SubtleCrypto engine REJECTS nonces that are not 12 bytes.
-  // We must use the pure Dart implementation for this specific legacy case.
-  final algorithm = kIsWeb
-      ? DartAesGcm(secretKeyLength: 32, nonceLength: 32) // ✅ Explicit 32-byte nonce
-      : AesGcm.with256bits(); // Native speed on mobile
+  if (kIsWeb) {
+    // Use PointyCastle on web - handles 32-byte nonce without SubtleCrypto restrictions
+    return _gDecryptLegacyPointyCastle(password, encryptedPayload);
+  }
+
+  // Mobile: use cryptography package (native, fast)
+  final algorithm = AesGcm.with256bits();
 
   // Hardcoded salt from original implementation (SECURITY: kept for backward compatibility only)
   const legacySalt = 'RbRiYJBS2MWk5xNIFJrfRBZEqiI/RUE94Euj6cLWO5U=';
   final salt = base64.decode(legacySalt);
 
   // Derive key using legacy hardcoded salt
-  // For legacy on Web, also force pure Dart PBKDF2
-  final secret = await _pass2key(password, salt, useDart: kIsWeb);
+  final secret = await _pass2key(password, salt);
 
   // In legacy format, IV/nonce was same as salt (32 bytes)
   final nonce = salt;
