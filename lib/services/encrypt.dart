@@ -109,8 +109,8 @@ Future<String> _gDecryptLegacy(String password, String encryptedPayload) async {
   // On Web, the native SubtleCrypto engine REJECTS nonces that are not 12 bytes.
   // We must use the pure Dart implementation for this specific legacy case.
   final algorithm = kIsWeb
-      ? DartAesGcm.with256bits() // Pure Dart, accepts 32-byte nonce
-      : AesGcm.with256bits();     // Native speed on mobile
+      ? DartAesGcm(secretKeyLength: 32, nonceLength: 32) // ✅ Explicit 32-byte nonce
+      : AesGcm.with256bits(); // Native speed on mobile
 
   // Hardcoded salt from original implementation (SECURITY: kept for backward compatibility only)
   const legacySalt = 'RbRiYJBS2MWk5xNIFJrfRBZEqiI/RUE94Euj6cLWO5U=';
