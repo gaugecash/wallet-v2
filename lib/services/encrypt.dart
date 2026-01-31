@@ -11,11 +11,19 @@ import 'package:pointycastle/export.dart' as pc;
 // since encryption library already calls native apis
 // [except on mobile Pbkdf2]
 
-Future<String> computeEncrypt(String password, String payload) =>
-    compute(_encryptComputeWrapper, {'password': password, 'payload': payload});
+Future<String> computeEncrypt(String password, String payload) {
+  if (kIsWeb) {
+    return _encryptComputeWrapper({'password': password, 'payload': payload});
+  }
+  return compute(_encryptComputeWrapper, {'password': password, 'payload': payload});
+}
 
-Future<String> computeDecrypt(String password, String payload) =>
-    compute(_decryptComputeWrapper, {'password': password, 'payload': payload});
+Future<String> computeDecrypt(String password, String payload) {
+  if (kIsWeb) {
+    return _decryptComputeWrapper({'password': password, 'payload': payload});
+  }
+  return compute(_decryptComputeWrapper, {'password': password, 'payload': payload});
+}
 
 Future<String> _encryptComputeWrapper(Map<String, String> map) =>
     _gEncrypt(map['password']!, map['payload']!);

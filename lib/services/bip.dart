@@ -4,11 +4,20 @@ import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wallet/logger.dart';
 
-Future<String> computeMnemonicToPrivateHex(String mnemonic) =>
-    compute(_mnemonicToPrivate, mnemonic);
+Future<String> computeMnemonicToPrivateHex(String mnemonic) {
+  if (kIsWeb) {
+    return _mnemonicToPrivate(mnemonic);
+  }
+  return compute(_mnemonicToPrivate, mnemonic);
+}
 
 // todo research whether this should be put into compute()
-Future<String> computeRandomMnemonic() => compute(_randomMnemonic, null);
+Future<String> computeRandomMnemonic() {
+  if (kIsWeb) {
+    return _randomMnemonic(null);
+  }
+  return compute(_randomMnemonic, null);
+}
 
 // todo research whether this should be put into compute()
 bool computeIsMnemonicValid(String mnemonic) {
