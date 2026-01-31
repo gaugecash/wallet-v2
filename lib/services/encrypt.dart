@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:math';
 
 import 'package:cryptography/cryptography.dart';
@@ -105,23 +106,41 @@ Future<String> _gDecryptNew(String password, String encryptedPayload) async {
 
 /// Decrypts LEGACY format using PointyCastle (pure Dart, works on web with 32-byte nonce)
 Future<String> _gDecryptLegacyPointyCastle(String password, String encryptedPayload) async {
-  // Legacy salt (also used as nonce)
-  const legacySalt = 'RbRiYJBS2MWk5xNIFJrfRBZEqiI/RUE94Euj6cLWO5U=';
-  final salt = base64.decode(legacySalt);
+  try {
+    // STEP 1: Parse salt
+    const legacySalt = 'RbRiYJBS2MWk5xNIFJrfRBZEqiI/RUE94Euj6cLWO5U=';
+    developer.log('[PC] STEP 1: Decoding legacy salt', name: 'PointyCastle');
+    final salt = base64.decode(legacySalt);
+    developer.log('[PC] STEP 1 ✅: salt length = ${salt.length}', name: 'PointyCastle');
 
-  // Parse 2-part format
-  final parts = encryptedPayload.split('.');
-  final cipherText = base64.decode(parts[0]);
-  final mac = base64.decode(parts[1]);
+    // STEP 2: Parse 2-part format
+    developer.log('[PC] STEP 2: Parsing payload', name: 'PointyCastle');
+    final parts = encryptedPayload.split('.');
+    if (parts.length != 2) {
+      throw ArgumentError('[PC] Invalid payload: expected 2 parts, got ${parts.length}');
+    }
+    final cipherText = base64.decode(parts[0]);
+    final mac = base64.decode(parts[1]);
+    developer.log('[PC] STEP 2 ✅: cipherText=${cipherText.length}, mac=${mac.length}', name: 'PointyCastle');
 
-  // Derive key using PBKDF2 (PointyCastle)
-  final pbkdf2 = pc.PBKDF2KeyDerivator(pc.HMac(pc.SHA256Digest(), 64))
-    ..init(pc.Pbkdf2Parameters(salt, 100000, 32));
-  final key = pbkdf2.process(utf8.encode(password));
+    // STEP 3: Derive key using PBKDF2 (PointyCastle)
+    developer.log('[PC] STEP 3: Initializing PBKDF2', name: 'PointyCastle');
+    final pbkdf2 = pc.PBKDF2KeyDerivator(pc.HMac(pc.SHA256Digest(), 64))
+      ..init(pc.Pbkdf2Parameters(salt, 100000, 32));
+    developer.log('[PC] STEP 3a: PBKDF2 initialized, processing password', name: 'PointyCastle');
 
-  // Decrypt using AES-GCM (PointyCastle)
-  final cipher = pc.GCMBlockCipher(pc.AESEngine())
-    ..init(
+    final passwordBytes = utf8.encode(password);
+    developer.log('[PC] STEP 3b: Password bytes length = ${passwordBytes.length}', name: 'PointyCastle');
+
+    final key = pbkdf2.process(passwordBytes);
+    developer.log('[PC] STEP 3 ✅: key length = ${key.length}, type = ${key.runtimeType}', name: 'PointyCastle');
+
+    // STEP 4: Initialize cipher
+    developer.log('[PC] STEP 4: Initializing AES-GCM cipher', name: 'PointyCastle');
+    final cipher = pc.GCMBlockCipher(pc.AESEngine());
+    developer.log('[PC] STEP 4a: Cipher created, initializing with parameters', name: 'PointyCastle');
+
+    cipher.init(
       false, // decrypt
       pc.AEADParameters(
         pc.KeyParameter(key),
@@ -130,14 +149,36 @@ Future<String> _gDecryptLegacyPointyCastle(String password, String encryptedPayl
         Uint8List(0), // no AAD
       ),
     );
+    developer.log('[PC] STEP 4 ✅: Cipher initialized', name: 'PointyCastle');
 
-  // Combine ciphertext + mac for GCM
-  final combined = Uint8List(cipherText.length + mac.length);
-  combined.setAll(0, cipherText);
-  combined.setAll(cipherText.length, mac);
+    // STEP 5: Combine ciphertext + mac for GCM
+    developer.log('[PC] STEP 5: Combining ciphertext and MAC', name: 'PointyCastle');
+    final combined = Uint8List(cipherText.length + mac.length);
+    combined.setAll(0, cipherText);
+    combined.setAll(cipherText.length, mac);
+    developer.log('[PC] STEP 5 ✅: combined length = ${combined.length}', name: 'PointyCastle');
 
-  final decrypted = cipher.process(combined);
-  return utf8.decode(decrypted);
+    // STEP 6: Decrypt
+    developer.log('[PC] STEP 6: Processing decryption', name: 'PointyCastle');
+    final decrypted = cipher.process(combined);
+    developer.log('[PC] STEP 6 ✅: decrypted length = ${decrypted.length}, type = ${decrypted.runtimeType}', name: 'PointyCastle');
+
+    // STEP 7: Convert to string
+    developer.log('[PC] STEP 7: Converting bytes to UTF-8 string', name: 'PointyCastle');
+
+    // Force type to Uint8List to avoid JS type issues
+    final decryptedBytes = decrypted is Uint8List ? decrypted : Uint8List.fromList(decrypted);
+    developer.log('[PC] STEP 7a: Converted to Uint8List, length = ${decryptedBytes.length}', name: 'PointyCastle');
+
+    final result = utf8.decode(decryptedBytes);
+    developer.log('[PC] STEP 7 ✅: string length = ${result.length}', name: 'PointyCastle');
+
+    return result;
+  } catch (e, stackTrace) {
+    developer.log('[PC] ❌ FAILED', error: e, stackTrace: stackTrace, name: 'PointyCastle');
+    developer.log('[PC] Error type: ${e.runtimeType}', name: 'PointyCastle');
+    rethrow;
+  }
 }
 
 /// Decrypts LEGACY format: ENCRYPTED_DATA.MAC (2 parts, with hardcoded salt)
