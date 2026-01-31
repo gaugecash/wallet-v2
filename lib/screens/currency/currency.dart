@@ -84,18 +84,6 @@ class CurrencyScreen extends HookConsumerWidget {
                   },
                 ),
               ),
-              if (coin.type == CurrencyTicker.gau) ...[
-                SizedBox(width: GPaddings.small(context)),
-                Expanded(
-                  child: GWalletActionButton(
-                    label: 'Buy GAU',
-                    icon: LucideIcons.shoppingCart,
-                    onPressed: () {
-                      context.router.pushNamed('/invest');
-                    },
-                  ),
-                ),
-              ],
             ],
           ),
         ),

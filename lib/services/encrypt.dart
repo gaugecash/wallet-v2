@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:cryptography/cryptography.dart';
+import 'package:cryptography/dart.dart';
 import 'package:flutter/foundation.dart';
 
 // i guess there is no need to use a JsWorker on the web
@@ -104,7 +105,12 @@ Future<String> _gDecryptNew(String password, String encryptedPayload) async {
 /// Decrypts LEGACY format: ENCRYPTED_DATA.MAC (2 parts, with hardcoded salt)
 /// This is for backward compatibility with backups created before Phase 1 Security update
 Future<String> _gDecryptLegacy(String password, String encryptedPayload) async {
-  final algorithm = AesGcm.with256bits();
+  // Legacy format used a 32-byte salt as the Nonce (IV).
+  // On Web, the native SubtleCrypto engine REJECTS nonces that are not 12 bytes.
+  // We must use the pure Dart implementation for this specific legacy case.
+  final algorithm = kIsWeb
+      ? DartAesGcm.with256bits() // Pure Dart, accepts 32-byte nonce
+      : AesGcm.with256bits();     // Native speed on mobile
 
   // Hardcoded salt from original implementation (SECURITY: kept for backward compatibility only)
   const legacySalt = 'RbRiYJBS2MWk5xNIFJrfRBZEqiI/RUE94Euj6cLWO5U=';
@@ -113,7 +119,7 @@ Future<String> _gDecryptLegacy(String password, String encryptedPayload) async {
   // Derive key using legacy hardcoded salt
   final secret = await _pass2key(password, salt);
 
-  // In legacy format, IV/nonce was same as salt
+  // In legacy format, IV/nonce was same as salt (32 bytes)
   final nonce = salt;
 
   // Parse 2-part format
@@ -130,6 +136,7 @@ Future<String> _gDecryptLegacy(String password, String encryptedPayload) async {
 
   return utf8.decode(result);
 }
+
 
 /// Derives encryption key from password using PBKDF2
 Future<SecretKey> _pass2key(String password, List<int> salt) async {
