@@ -66,15 +66,10 @@ platform :ios do
 
   desc "Deploy to TestFlight"
   lane :beta do
-    # Build and sign
     build_signed
 
-    # Upload to TestFlight
-    # (API key is already configured in before_all)
     upload_to_testflight(
-      skip_waiting_for_build_processing: false,
-      skip_submission: false,
-      precheck_include_in_app_purchases: false
+      skip_waiting_for_build_processing: true
     )
 
     UI.success("Successfully uploaded to TestFlight!")
