@@ -8,7 +8,11 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wallet/services/encrypt.dart';
+import 'package:wallet/services/wallet_backup_helpers.dart';
 import 'package:wallet/utils/git_commit.dart';
+
+// Conditional import for direct JS interop on web
+import 'legacy_decrypt_web.dart' if (dart.library.io) 'legacy_decrypt_stub.dart';
 
 part 'wallet_backup.g.dart';
 
@@ -22,7 +26,46 @@ class WalletBackup {
     this.backupFileVersion = 0,
   });
 
+  /// Internal constructor for legacy restore - makes optional fields nullable
+  WalletBackup._legacy({
+    required this.mnemonic,
+    DateTime? createdAt,
+    String? appVersion,
+    String? appBuild,
+    required this.backupFileVersion,
+  })  : createdAt = createdAt ?? DateTime(2020, 1, 1),
+        appVersion = appVersion ?? 'unknown',
+        appBuild = appBuild ?? 'unknown';
+
   factory WalletBackup.fromJson(Map<String, dynamic> json) => _$WalletBackupFromJson(json);
+
+  /// BULLETPROOF LEGACY PARSER for Flutter Web dart2js release mode
+  /// NEVER throws except for missing mnemonic
+  factory WalletBackup.fromLegacyJsonString(String jsonString) {
+    // 1) Decode JSON safely (never throw FormatException)
+    final decoded = safeJsonDecode(jsonString);
+
+    // 2) Coerce to pure Dart map (never throw TypeError)
+    final Map<String, Object?> m = coerceToStringKeyMap(decoded);
+
+    // 3) Extract required mnemonic (ONLY hard failure allowed)
+    final mnemonic = requireNonEmptyString(m['mnemonic'], fieldName: 'mnemonic');
+
+    // 4) Extract optional fields safely (never throw)
+    final createdAt = safeParseDateTime(m['createdAt']);
+    final appVersion = safeOptionalString(m['appVersion']);
+    final appBuild = safeOptionalString(m['appBuild']);
+    final backupFileVersion = safeInt(m['backupFileVersion']) ?? 0;
+
+    // 5) Use internal constructor that provides defaults
+    return WalletBackup._legacy(
+      mnemonic: mnemonic,
+      createdAt: createdAt,
+      appVersion: appVersion,
+      appBuild: appBuild,
+      backupFileVersion: backupFileVersion,
+    );
+  }
 
   static Future<WalletBackup> generate(String mnemonic) async {
     final createdAt = DateTime.now();
@@ -61,9 +104,29 @@ class WalletBackup {
   }
 
   static Future<WalletBackup> decrypt(String password, String encrypted) async {
-    final result = await computeDecrypt(password, encrypted);
-    final json = jsonDecode(result) as Map<String, dynamic>;
-    return WalletBackup.fromJson(json);
+    String result;
+
+    if (kIsWeb) {
+      developer.log('[WALLET_BACKUP] Web platform: calling JS directly', name: 'GAUwallet');
+
+      // DIRECT synchronous JS call - NO Future wrapping, NO encrypt.dart chain
+      result = decryptLegacyBackupJS(password, encrypted);
+
+      // Handle JS error
+      if (result.startsWith('JS_ERROR:')) {
+        throw Exception(result.replaceFirst('JS_ERROR:', ''));
+      }
+
+      // Use legacy parser for web - avoids `as String` cast errors in dart2js minified mode
+      return WalletBackup.fromLegacyJsonString(result);
+    } else {
+      // Mobile: use existing async path through encrypt.dart
+      result = await computeDecrypt(password, encrypted);
+
+      // Use standard generated parser for mobile
+      final json = jsonDecode(result) as Map<String, dynamic>;
+      return WalletBackup.fromJson(json);
+    }
   }
 
   /// Validates encrypted backup file format

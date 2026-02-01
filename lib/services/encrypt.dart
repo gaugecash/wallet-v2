@@ -7,20 +7,31 @@ import 'package:cryptography/dart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pointycastle/export.dart' as pc;
 
+// Conditional import: Use JS interop on web, stub on mobile
+import 'legacy_decrypt_web.dart' if (dart.library.io) 'legacy_decrypt_stub.dart';
+
 // i guess there is no need to use a JsWorker on the web
 // since encryption library already calls native apis
 // [except on mobile Pbkdf2]
 
 Future<String> computeEncrypt(String password, String payload) {
   if (kIsWeb) {
-    return _encryptComputeWrapper({'password': password, 'payload': payload});
+    try {
+      return _gEncrypt(password, payload);
+    } catch (e) {
+      return Future.error(e);
+    }
   }
   return compute(_encryptComputeWrapper, {'password': password, 'payload': payload});
 }
 
 Future<String> computeDecrypt(String password, String payload) {
   if (kIsWeb) {
-    return _decryptComputeWrapper({'password': password, 'payload': payload});
+    try {
+      return _gDecrypt(password, payload);
+    } catch (e) {
+      return Future.error(e);
+    }
   }
   return compute(_decryptComputeWrapper, {'password': password, 'payload': payload});
 }
@@ -71,7 +82,7 @@ Future<String> _gEncrypt(String password, String payload) async {
 /// Supports BOTH formats for backward compatibility:
 /// - NEW FORMAT (4 parts): SALT.IV.ENCRYPTED_DATA.AUTH_TAG
 /// - OLD FORMAT (2 parts): ENCRYPTED_DATA.MAC (uses hardcoded salt)
-Future<String> _gDecrypt(String password, String encryptedPayload) async {
+Future<String> _gDecrypt(String password, String encryptedPayload) {
   final parts = encryptedPayload.split('.');
 
   // Detect format based on number of parts
@@ -199,7 +210,7 @@ Future<String> _gDecryptLegacyPointyCastle(String password, String encryptedPayl
     final result = utf8.decode(decryptedBytes);
     developer.log('[PC] STEP 7 ✅: string length = ${result.length}', name: 'PointyCastle');
 
-    return result;
+    return result.toString();  // Explicitly force String type for JavaScript compatibility
   } catch (e, stackTrace) {
     developer.log('[PC] ❌ FAILED', error: e, stackTrace: stackTrace, name: 'PointyCastle');
     developer.log('[PC] Error type: ${e.runtimeType}', name: 'PointyCastle');
@@ -211,10 +222,17 @@ Future<String> _gDecryptLegacyPointyCastle(String password, String encryptedPayl
 /// This is for backward compatibility with backups created before Phase 1 Security update
 Future<String> _gDecryptLegacy(String password, String encryptedPayload) async {
   if (kIsWeb) {
-    // Use PointyCastle on web - handles 32-byte nonce without SubtleCrypto restrictions
-    return _gDecryptLegacyPointyCastle(password, encryptedPayload);
+    // Use JavaScript implementation - bypasses dart2js minification issues entirely
+    developer.log('[ENCRYPT] Web platform: routing legacy decrypt to JavaScript interop', name: 'GAUwallet');
+    // CRITICAL: Return synchronous String directly - let async wrapper handle Future
+    // NOT Future.value() which creates nested Future that dart2js mangles
+    return decryptLegacyBackupJS(password, encryptedPayload);
   }
 
+  return _gDecryptLegacyMobile(password, encryptedPayload);
+}
+
+Future<String> _gDecryptLegacyMobile(String password, String encryptedPayload) async {
   // Mobile: use cryptography package (native, fast)
   final algorithm = AesGcm.with256bits();
 
