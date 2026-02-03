@@ -229,7 +229,7 @@ Future<String> _gDecryptLegacy(String password, String encryptedPayload) async {
     return decryptLegacyBackupJS(password, encryptedPayload);
   }
 
-  return _gDecryptLegacyMobile(password, encryptedPayload);
+  return _gDecryptLegacyPointyCastle(password, encryptedPayload);
 }
 
 Future<String> _gDecryptLegacyMobile(String password, String encryptedPayload) async {

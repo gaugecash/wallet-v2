@@ -123,9 +123,8 @@ class WalletBackup {
       // Mobile: use existing async path through encrypt.dart
       result = await computeDecrypt(password, encrypted);
 
-      // Use standard generated parser for mobile
-      final json = jsonDecode(result) as Map<String, dynamic>;
-      return WalletBackup.fromJson(json);
+      // Use legacy parser for mobile (handles missing/null fields gracefully)
+      return WalletBackup.fromLegacyJsonString(result);
     }
   }
 
