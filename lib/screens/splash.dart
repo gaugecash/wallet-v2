@@ -125,22 +125,11 @@ class SplashScreen extends HookConsumerWidget {
         context.router.replaceNamed('/home');
       }
     } else {
-      // No wallet found in Hive - check for auto-saved backup
-      final autoSavedBackup = await WalletBackup.checkForAutoSavedBackup();
-
-      // VALIDATION: Only navigate to restore if content is a valid backup format
-      final isValidBackup = autoSavedBackup != null && WalletBackup.validate(autoSavedBackup);
-
-      if (isValidBackup) {
-        developer.log('DEBUG: INIT - Valid auto-saved backup found, navigating to /set_up/restore', name: 'GAUwallet');
-        if (context.mounted) {
-          context.router.replaceNamed('/set_up/restore');
-        }
-      } else {
-        developer.log('DEBUG: INIT - No valid backup found, navigating to /set_up (intro)', name: 'GAUwallet');
-        if (context.mounted) {
-          context.router.replaceNamed('/set_up');
-        }
+      // No wallet found - always go to welcome screen
+      // User can manually choose to restore if they have a backup
+      developer.log('DEBUG: INIT - No wallet setup, navigating to /set_up (welcome)', name: 'GAUwallet');
+      if (context.mounted) {
+        context.router.replaceNamed('/set_up');
       }
     }
   }
