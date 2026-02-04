@@ -7,9 +7,6 @@ import 'package:cryptography/dart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pointycastle/export.dart' as pc;
 
-// Conditional import: Use JS interop on web, stub on mobile
-import 'legacy_decrypt_web.dart' if (dart.library.io) 'legacy_decrypt_stub.dart';
-
 // i guess there is no need to use a JsWorker on the web
 // since encryption library already calls native apis
 // [except on mobile Pbkdf2]
@@ -221,14 +218,6 @@ Future<String> _gDecryptLegacyPointyCastle(String password, String encryptedPayl
 /// Decrypts LEGACY format: ENCRYPTED_DATA.MAC (2 parts, with hardcoded salt)
 /// This is for backward compatibility with backups created before Phase 1 Security update
 Future<String> _gDecryptLegacy(String password, String encryptedPayload) async {
-  if (kIsWeb) {
-    // Use JavaScript implementation - bypasses dart2js minification issues entirely
-    developer.log('[ENCRYPT] Web platform: routing legacy decrypt to JavaScript interop', name: 'GAUwallet');
-    // CRITICAL: Return synchronous String directly - let async wrapper handle Future
-    // NOT Future.value() which creates nested Future that dart2js mangles
-    return decryptLegacyBackupJS(password, encryptedPayload);
-  }
-
   return _gDecryptLegacyPointyCastle(password, encryptedPayload);
 }
 
